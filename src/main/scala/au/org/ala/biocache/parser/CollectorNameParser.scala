@@ -121,30 +121,30 @@ object CollectorNameParser {
   }
 
   def generateName(firstName: String, surname: String, initials: String, middlename: String = null, surnamePrefix: String = null): String = {
-    var name = "";
-    if (surnamePrefix != null)
-      name += surnamePrefix.trim + " "
-    if (surname != null)
-      name += org.apache.commons.lang3.text.WordUtils.capitalize(surname.toLowerCase(), '-', '\'')
-    if (StringUtils.isNotBlank(initials)) {
-      name += ", "
+    var name = ""
+
+    // First name
+    if (StringUtils.isNotBlank(firstName)) {
+      name += org.apache.commons.lang3.StringUtils.capitalize(firstName.toLowerCase()) + " "
+    } else if (StringUtils.isNotBlank(initials)) {
       val newinit = initials.trim.replaceAll("[^\\p{Lu}\\p{Ll}-]", "")
-      //println(newinit)
+
       newinit.toCharArray().foreach(c =>
         name += c + "."
       )
-      name = name.replaceAll("\\.-\\.", "-")
 
+      name = name.replaceAll("\\.-\\.", "-") + " "
     }
-    if (StringUtils.isNotBlank(firstName)) {
 
-      if (StringUtils.isBlank(initials)) {
-        name += ", " + firstName.charAt(0).toUpper + "."
-        if (StringUtils.isNotBlank(middlename))
-          name += middlename.charAt(0).toUpper + "."
+    // Surname
+    if (surname != null) {
+      if(surnamePrefix != null) {
+        name += surnamePrefix.trim + " "
       }
-      name += " " + org.apache.commons.lang3.StringUtils.capitalize(firstName.toLowerCase())
+
+      name += org.apache.commons.lang3.text.WordUtils.capitalize(surname.toLowerCase(), '-', '\'')
     }
+
     name.trim
   }
 
