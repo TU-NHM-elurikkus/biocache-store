@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory
 import org.slf4j.Logger
 import java.util.Date
 import java.text.ParseException
+import java.time.ZonedDateTime
+import java.time.format.{DateTimeFormatter, DateTimeParseException}
+
 import scala.Predef._
 import au.org.ala.biocache.util.DateUtil
 
@@ -75,8 +78,9 @@ object DateParser {
    * 2005-06-12 00:00:00.0/2005-06-12 00:00:00.0 
    */
   def parseISODate(date: String): Option[EventDate] = {
+    val dateWithoutNS = throwNanosecondsAway(date)
 
-    date match {
+    dateWithoutNS match {
       case ISOSingleDate(date) => Some(date)
       case ISOSingleYear(date) => Some(date)
       case ISOWithMonthNameDate(date) => Some(date)
@@ -92,6 +96,20 @@ object DateParser {
       case ISOVerboseDateTimeRange(date) => Some(date)
       case NonISODateTime(date) => Some(date)
       case _ => None
+    }
+  }
+
+  def throwNanosecondsAway(date: String): String = {
+    // PlutoF export all datetimes with ns precision, which SimpleDateFormat can't parse. Since
+    // we use only date from here, there is no problem with throwing fractional second part away
+    try {
+      val zdt = ZonedDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+
+      zdt.withNano(0).format(DateTimeFormatter.ISO_DATE_TIME)
+    } catch {
+      case e: DateTimeParseException => {
+        date
+      }
     }
   }
 
