@@ -2,15 +2,16 @@ package au.org.ala.biocache.processor
 
 import au.org.ala.biocache.Config
 import org.slf4j.LoggerFactory
+
 import scala.collection.JavaConversions
 import scala.collection.mutable.{ArrayBuffer, HashMap}
 import au.org.ala.names.model.LinnaeanRankClassification
 import org.apache.commons.lang.StringUtils
-import au.org.ala.biocache.caches.{CommonNameDAO, TaxonProfileDAO, ClassificationDAO, AttributionDAO}
+import au.org.ala.biocache.caches._
 import au.org.ala.biocache.util.BiocacheConversions
-import au.org.ala.biocache.model.{QualityAssertion, FullRecord, Classification}
+import au.org.ala.biocache.model.{Classification, FullRecord, QualityAssertion}
 import au.org.ala.biocache.load.FullRecordMapper
-import au.org.ala.biocache.vocab.{AssertionStatus, Kingdoms, DwC, AssertionCodes}
+import au.org.ala.biocache.vocab.{AssertionCodes, AssertionStatus, DwC, Kingdoms}
 
 /**
  * A processor of taxonomic information.
@@ -177,6 +178,8 @@ class ClassificationProcessor extends Processor {
 
         val nsr = nameMetrics.getResult
 
+        // GUID: nsr.getId()
+
         //store the matched classification
         if (nsr != null) {
           //The name is recognised:
@@ -254,10 +257,12 @@ class ClassificationProcessor extends Processor {
           setMatchStats(nameMetrics, processed, assertions)
 
           //is the name in the NSLs ???
-          if (Config.nationalChecklistIdentifierPattern != "" && nationalChecklistIdentifierPattern.findFirstMatchIn(nsr.getLsid).isEmpty) {
-            assertions += QualityAssertion(NAME_NOT_IN_NATIONAL_CHECKLISTS, "Record not attached to concept in national species lists")
-          } else {
-            assertions += QualityAssertion(NAME_NOT_IN_NATIONAL_CHECKLISTS, PASSED)
+          if(Config.checklistEnabled) {
+            if (isInChecklist(nsr.getLsid())) {
+              assertions += QualityAssertion(NAME_NOT_IN_NATIONAL_CHECKLISTS, PASSED)
+            } else {
+              assertions += QualityAssertion(NAME_NOT_IN_NATIONAL_CHECKLISTS, "Record not attached to concept in national species lists")
+            }
           }
 
         } else if(nameMetrics.getErrors.contains(au.org.ala.names.model.ErrorType.HOMONYM)){
@@ -286,6 +291,10 @@ class ClassificationProcessor extends Processor {
       case e: Exception => logger.error("Exception during classification match for record " + guid, e)
     }
     assertions.toArray
+  }
+
+  def isInChecklist(lsid: String) : Boolean  = {
+    ChecklistCache.contains(Integer.parseInt(lsid))
   }
 
   def getName = FullRecordMapper.taxonomicalQa

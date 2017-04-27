@@ -269,6 +269,9 @@ object Config {
 
   val exportIndexAsCsvPath = configModule.properties.getProperty("export.index.as.csv.path", "")
   val exportIndexAsCsvPathSensitive = configModule.properties.getProperty("export.index.as.csv.path.sensitive", "")
+
+  var checklistEnabled = configModule.properties.getProperty("erk.checklist.enabled", "false").toBoolean
+  var checklistPath = configModule.properties.getProperty("erk.checklist.path", "")
 }
 
 /**
