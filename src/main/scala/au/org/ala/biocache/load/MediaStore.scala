@@ -35,11 +35,11 @@ trait MediaStore {
   //http://stackoverflow.com/questions/169625/regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif#169656
   //Extended to allow query parameters after the path and ftp as well as http access
   lazy val imageParser = """^((?:http|ftp|file)s?://[^\'"<>]+?\.(jpg|jpeg|gif|png)(\?.+)?)$""".r
-  lazy val soundParser = """^((?:http|ftp|file)s?://[^\'"<>]+?\.(?:wav|mp3|ogg|flac)(\?.+)?)$""".r
+  lazy val soundParser = """^((?:http|ftp|file)s?://[^\'"<>]+?\.(?:wav|mp3|ogg|flac|m4a)(\?.+)?)$""".r
   lazy val videoParser = """^((?:http|ftp|file)s?://[^\'"<>]+?\.(?:wmv|mp4|mpg|avi|mov)(\?.+)?)$""".r
 
   val imageExtension = Array(".jpg", ".gif", ".png", ".jpeg", "imgType=jpeg")
-  val soundExtension = Array(".wav", ".mp3", ".ogg", ".flac")
+  val soundExtension = Array(".wav", ".mp3", ".ogg", ".flac", ".m4a")
   val videoExtension = Array(".wmv", ".mp4", ".mpg", ".avi", ".mov")
 
   def isValidImageURL(url: String) = !imageParser.unapplySeq(url.trim.toLowerCase).isEmpty
@@ -575,7 +575,8 @@ object LocalMediaStore extends MediaStore {
 
   val extensionToMimeTypes = Map(
     "mp3" -> "audio/mpeg",
-    "ogg" ->  "audio/ogg"
+    "ogg" -> "audio/ogg",
+    "m4a" -> "audio/mp4"
   )
 
   def getSoundFormats(filePath: String): java.util.Map[String, String] = {
