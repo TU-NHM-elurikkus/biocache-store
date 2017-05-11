@@ -152,6 +152,8 @@ object Config {
     }
   }
 
+  val deduplicatePlutofLinks = configModule.properties.getProperty("erk.deduplicate.plutof.links", "false").toBoolean
+
   val speciesSubgroupsUrl = configModule.properties.getProperty("species.subgroups.url","http://bie.ala.org.au/subgroups.json")
 
   val listToolUrl = configModule.properties.getProperty("list.tool.url","http://lists.ala.org.au")

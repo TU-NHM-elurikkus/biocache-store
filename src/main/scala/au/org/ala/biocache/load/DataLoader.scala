@@ -262,6 +262,35 @@ trait DataLoader {
     true
   }
 
+  def filterURLs(associatedMedia: Seq[String], suppliedMedia: Seq[String]) : Seq[String] = {
+    val media = new ArrayBuffer[String]
+
+    if (Config.deduplicatePlutofLinks) {
+      val isPlutofImage = { url: String =>
+        url.contains("plutof.ut.ee") && Config.mediaStore.isValidImageURL(url)
+      }
+
+      val (plutofAM, otherAM) = associatedMedia.partition(isPlutofImage)
+      var (plutofSM, otherSM) = suppliedMedia.partition(isPlutofImage)
+
+      media ++= otherAM
+      media ++= otherSM
+
+      media ++= (if (plutofAM.length == plutofSM.length) {
+        plutofSM
+      } else {
+        plutofAM
+      })
+    } else {
+      media ++= associatedMedia
+      media ++= suppliedMedia
+    }
+
+    media.filter { url =>
+      Config.blacklistedMediaUrls.forall(!url.startsWith(_))
+    }
+  }
+
   /**
    * Load the media where possible.
    *
@@ -278,9 +307,7 @@ trait DataLoader {
       suppliedMedia.forall(!_.endsWith(url))
     }
 
-    val filesToImport = (associatedMedia ++ suppliedMedia).filter { url =>
-      Config.blacklistedMediaUrls.forall(!url.startsWith(_))
-    }
+    val filesToImport = filterURLs(associatedMedia, suppliedMedia)
 
     if (filesToImport.isEmpty) {
       return fr
