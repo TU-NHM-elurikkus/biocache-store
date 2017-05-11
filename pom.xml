@@ -798,8 +798,6 @@
                                 <id>biocache</id>
                                 <mainClass>au.org.ala.biocache.cmd.CMD2</mainClass>
                                 <jvmSettings>
-                                    <initialMemorySize>16g</initialMemorySize>
-                                    <maxMemorySize>16g</maxMemorySize>
                                     <extraArguments>
                                         <extraArgument>$BIOCACHE_OPTS</extraArgument>
                                         <extraArgument>-XX:+UseG1GC</extraArgument>
@@ -814,11 +812,27 @@
                                 </jvmSettings>
                             </program>
                             <program>
+                                <id>biocache-debug</id>
+                                <mainClass>au.org.ala.biocache.cmd.CMD2</mainClass>
+                                <jvmSettings>
+                                    <extraArguments>
+                                        <extraArgument>$BIOCACHE_OPTS</extraArgument>
+                                        <extraArgument>-XX:+UseG1GC</extraArgument>
+                                        <extraArgument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</extraArgument>
+                                        <extraArgument>-Dfile.encoding=UTF8</extraArgument>
+                                        <extraArgument>-Dlog4j.configuration=log4j.xml</extraArgument>
+                                        <extraArgument>-Dactors.corePoolSize=8</extraArgument>
+                                        <extraArgument>-Dactors.maxPoolSize=16</extraArgument>
+                                        <extraArgument>-Dactors.minPoolSize=8</extraArgument>
+                                        <extraArgument>-Djava.util.Arrays.useLegacyMergeSort=true</extraArgument>
+                                        <extraArgument>-Dactors.maxPoolSize=8</extraArgument>
+                                    </extraArguments>
+                                </jvmSettings>
+                            </program>
+                            <program>
                                 <id>biocache-species-outliers</id>
                                 <mainClass>au.org.ala.biocache.outliers.SpeciesOutlierTests</mainClass>
                                 <jvmSettings>
-                                    <initialMemorySize>16g</initialMemorySize>
-                                    <maxMemorySize>16g</maxMemorySize>
                                     <extraArguments>
                                         <extraArgument>$BIOCACHE_OPTS</extraArgument>
                                         <extraArgument>-XX:+UseG1GC</extraArgument>
