@@ -465,8 +465,9 @@ object LocalMediaStore extends MediaStore {
     val dp = url.lastIndexOf(".")
     val extension = if (dp >= 0) url.substring(dp) else ""
     val map = new util.HashMap[String, String]
+    val image_extensions = Array(".jpg", ".jpeg", ".png")
     //some files will not have an extension
-    if (extension.length() != 4) {
+    if (!image_extensions.contains(extension.toLowerCase)) {
       map.put("thumb", url + "__thumb")
       map.put("small", url + "__small")
       map.put("large", url + "__large")
