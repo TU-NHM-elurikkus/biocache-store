@@ -87,7 +87,7 @@ object Config {
 
   val extraMiscFields = configModule.properties.getProperty("extra.misc.fields","")
 
-  val technicalContact = configModule.properties.getProperty("technical.contact", "support@ala.org.au")
+  val technicalContact = configModule.properties.getProperty("technical.contact", "info@elurikkus.ut.ee")
 
   val irmngDwcArchiveUrl = configModule.properties.getProperty("irmng.archive.url", "http://www.cmar.csiro.au/datacentre/downloads/IRMNG_DWC.zip")
 
