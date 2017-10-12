@@ -38,63 +38,63 @@ class LocationProcessor extends Processor {
     //parse altitude and depth values
     processAltitudeAndDepth(guid, raw, processed, assertions)
 
-    //Continue processing location if a processed longitude and latitude exists
+    // Continue processing location if a processed longitude and latitude exists
     if (processed.location.decimalLatitude != null && processed.location.decimalLongitude != null) {
 
-      //store the point for downstream processing
-      LocationDAO.storePointForSampling(processed.location.decimalLatitude, processed.location.decimalLongitude)
+        // store the point for downstream processing
+        LocationDAO.storePointForSampling(processed.location.decimalLatitude, processed.location.decimalLongitude)
 
-      //validate the coordinate values
-      validateCoordinatesValues(raw, processed, assertions)
+        // validate the coordinate values
+        validateCoordinatesValues(raw, processed, assertions)
 
-      //validate coordinate accuracy (coordinateUncertaintyInMeters) and coordinatePrecision (precision - A. Chapman)
-      checkCoordinateUncertainty(raw, processed, assertions)
+        // validate coordinate accuracy (coordinateUncertaintyInMeters) and coordinatePrecision (precision - A. Chapman)
+        checkCoordinateUncertainty(raw, processed, assertions)
 
-      //intersect values with sensitive areas
-      val intersectValues = SpatialLayerDAO.intersect(processed.location.decimalLongitude, processed.location.decimalLatitude)
+        // intersect values with sensitive areas
+        val intersectValues = SpatialLayerDAO.intersect(processed.location.decimalLongitude, processed.location.decimalLatitude)
 
-      //add state province, country, LGA
-      processed.location.stateProvince = intersectValues.getOrElse(Config.stateProvinceLayerID, null)
-      processed.location.lga  = intersectValues.getOrElse(Config.localGovLayerID, null)
-      processed.location.country = intersectValues.getOrElse(Config.countriesLayerID, null)
+        // add state province, country, LGA
+        processed.location.stateProvince = intersectValues.getOrElse(Config.stateProvinceLayerID, null)
+        processed.location.lga  = intersectValues.getOrElse(Config.localGovLayerID, null)
+        processed.location.country = intersectValues.getOrElse(Config.countriesLayerID, null)
 
-      if (processed.location.country == null && processed.location.stateProvince != null) {
-        processed.location.country = Config.defaultCountry
-      }
+        if (processed.location.country == null && processed.location.stateProvince != null) {
+            processed.location.country = Config.defaultCountry
+        }
 
-      //habitat, no standard vocab available
-      processed.location.habitat = raw.location.habitat
+        // habitat, no standard vocab available
+        processed.location.habitat = raw.location.habitat
 
-      //add the layers that are associated with the point
-      processed.location.biome = {
-        if (intersectValues.getOrElse(Config.terrestrialLayerID, null) != null) "Terrestrial"
-        else if (intersectValues.getOrElse(Config.marineLayerID, null) != null) "Marine"
-        else null
-      }
+        // add the layers that are associated with the point
+        processed.location.biome = {
+            if (intersectValues.getOrElse(Config.terrestrialLayerID, null) != null) "Terrestrial"
+            else if (intersectValues.getOrElse(Config.marineLayerID, null) != null) "Marine"
+            else null
+        }
 
-      //check matched stateProvince
-      checkForStateMismatch(raw, processed, assertions)
+        // check matched stateProvince
+        checkForStateMismatch(raw, processed, assertions)
 
-      //add the conservation status if necessary
-      addConservationStatus(raw, processed)
+        // add the conservation status if necessary
+        addConservationStatus(raw, processed)
 
-      //check marine/non-marine
-      checkForBiomeMismatch(raw, processed, assertions)
+        // check marine/non-marine
+        checkForBiomeMismatch(raw, processed, assertions)
     }
 
-    //create flag if no location info was supplied for this record
+    // create flag if no location info was supplied for this record
     checkLocationSupplied(raw, processed, assertions)
 
-    //run validation tests against the processed coordinates
+    // run validation tests against the processed coordinates
     validateCoordinates(raw, processed, assertions)
 
-    //process state/country values if coordinates not determined
+    // process state/country values if coordinates not determined
     processStateCountryValues(raw, processed, assertions)
 
-    //validate the geo-reference values
+    // validate the geo-reference values
     validateGeoreferenceValues(raw, processed, assertions)
 
-    //return the assertions created by this processor
+    // return the assertions created by this processor
     assertions.toArray
   }
 
@@ -119,42 +119,42 @@ class LocationProcessor extends Processor {
     }
   }
 
-  /**
-   * If no coordinates have been supplied, parse raw state and country values to vocabularies.
-   *
-   * @param raw
-   * @param processed
-   * @param assertions
-   */
-  private def processStateCountryValues(raw: FullRecord, processed: FullRecord, assertions: ArrayBuffer[QualityAssertion]){
+    /**
+    * If no coordinates have been supplied, parse raw state and country values to vocabularies.
+    *
+    * @param raw
+    * @param processed
+    * @param assertions
+    */
+    private def processStateCountryValues(raw: FullRecord, processed: FullRecord, assertions: ArrayBuffer[QualityAssertion]) {
 
-    //Only process the raw state value if no latitude and longitude is provided
-    if (processed.location.stateProvince == null && raw.location.decimalLatitude == null && raw.location.decimalLongitude == null) {
-      //process the supplied state
-      val stateTerm = StateProvinces.matchTerm(raw.location.stateProvince)
-      if (!stateTerm.isEmpty) {
-        processed.location.stateProvince = stateTerm.get.canonical
-        processed.location.country = StateProvinceToCountry.map.getOrElse(processed.location.stateProvince, "")
-      }
-    }
+        // Process the raw state value
+        if (processed.location.stateProvince == null) {
+            //process the supplied state
+            val stateTerm = StateProvinces.matchTerm(raw.location.stateProvince)
+            if (!stateTerm.isEmpty) {
+                processed.location.stateProvince = stateTerm.get.canonical
+                processed.location.country = StateProvinceToCountry.map.getOrElse(processed.location.stateProvince, "")
+            }
+        }
 
-    //Only process the raw country value if no latitude and longitude is provided
-    if (processed.location.country == null && raw.location.decimalLatitude == null && raw.location.decimalLongitude == null) {
-      //process the supplied state
-      val countryTerm = Countries.matchTerm(raw.location.country)
-      if (!countryTerm.isEmpty) {
-        processed.location.country = countryTerm.get.canonical
-      }
-    }
+        // Process the raw country value
+        if (processed.location.country == null) {
+            //process the supplied state
+            val countryTerm = Countries.matchTerm(raw.location.country)
+            if (!countryTerm.isEmpty) {
+                processed.location.country = countryTerm.get.canonical
+            }
+        }
 
-    //Try the country code
-    if (processed.location.country == null && raw.location.countryCode != null){
-      val countryCodeTerm = Countries.matchTerm(raw.location.countryCode)
-      if (!countryCodeTerm.isEmpty) {
-        processed.location.country = countryCodeTerm.get.canonical
-      }
+        // Try the country code
+        if (processed.location.country == null && raw.location.countryCode != null) {
+            val countryCodeTerm = Countries.matchTerm(raw.location.countryCode)
+            if (!countryCodeTerm.isEmpty) {
+                processed.location.country = countryCodeTerm.get.canonical
+            }
+        }
     }
-  }
 
   /**
    * Validation checks

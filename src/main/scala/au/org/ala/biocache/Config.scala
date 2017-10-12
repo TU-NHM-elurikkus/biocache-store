@@ -211,7 +211,7 @@ object Config {
   val gridRefIndexingEnabled = BooleanUtils.toBoolean(configModule.properties.getProperty("gridref.indexing.enabled", "false"))
 
   //used by location processor for associating a country with an occurrence record where only stateProvince supplied
-  val defaultCountry = configModule.properties.getProperty("default.country", "Australia")
+  val defaultCountry = configModule.properties.getProperty("default.country", "Estonia")
 
   val versionProperties = {
     val properties = new Properties()
