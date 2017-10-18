@@ -90,10 +90,10 @@ object Thumbnailer extends Tool {
     val extension = FilenameUtils.getExtension(source.getAbsolutePath)
     val targetFilePath = {
       //source may not have an extension
-      if (extension) {
-        source.getAbsolutePath.replace("." + extension, imageSize.suffix + "." + extension)
-      } else {
+      if (extension.isEmpty()) {
         source.getAbsolutePath + imageSize.suffix
+      } else {
+        source.getAbsolutePath.replace("." + extension, imageSize.suffix + "." + extension)
       }
     }
     val target = new File(targetFilePath)
