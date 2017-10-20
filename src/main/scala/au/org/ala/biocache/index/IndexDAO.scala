@@ -418,7 +418,7 @@ trait IndexDAO {
           case e: Exception => distanceOutsideExpertRange = ""
         }
 
-        //the returned list needs to match up with the CSV header
+        // the returned list needs to match up with the CSV header
         return List(
           getValue("uuid", map),
           getValue("rowKey", map),
@@ -1081,7 +1081,7 @@ trait IndexDAO {
         i = i + 1
         addField(doc,header(i), map.getOrElse("nameParseType.p", ""))
         i = i + 1
-        addField(doc,header(i), map.getOrElse("occurrenceStatus.p", ""))
+        addField(doc,header(i), map.getOrElse("occurrenceStatus.p", "present"))
         i = i + 1
         addField(doc,header(i), map.getOrElse("occurrenceDetails", ""))
         i = i + 1
