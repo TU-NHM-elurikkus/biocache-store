@@ -34,9 +34,9 @@ trait MediaStore {
   //Regular expression used to parse an image URL - adapted from
   //http://stackoverflow.com/questions/169625/regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif#169656
   //Extended to allow query parameters after the path and ftp as well as http access
-  lazy val imageParser = """^((?:http|ftp|file)s?://[^\'"<>]+?\.(jpg|jpeg|gif|png)(\?.+)?)$""".r
-  lazy val soundParser = """^((?:http|ftp|file)s?://[^\'"<>]+?\.(?:wav|mp3|ogg|flac|m4a)(\?.+)?)$""".r
-  lazy val videoParser = """^((?:http|ftp|file)s?://[^\'"<>]+?\.(?:wmv|mp4|mpg|avi|mov)(\?.+)?)$""".r
+  lazy val imageParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(jpg|jpeg|gif|png)(\?.+)?)$""".r
+  lazy val soundParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:wav|mp3|ogg|flac|m4a)(\?.+)?)$""".r
+  lazy val videoParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:wmv|mp4|mpg|avi|mov)(\?.+)?)$""".r
 
   val imageExtension = Array(".jpg", ".gif", ".png", ".jpeg", "imgType=jpeg")
   val soundExtension = Array(".wav", ".mp3", ".ogg", ".flac", ".m4a")
@@ -466,12 +466,12 @@ object LocalMediaStore extends MediaStore {
     val extension = if (dp >= 0) url.substring(dp) else ""
     val map = new util.HashMap[String, String]
     val image_extensions = Array(".jpg", ".jpeg", ".png")
-    //some files will not have an extension
-    if (!image_extensions.contains(extension.toLowerCase)) {
+    // some files will not have an extension - also some files are not images...
+    if (extension.isEmpty()) {
       map.put("thumb", url + "__thumb")
       map.put("small", url + "__small")
       map.put("large", url + "__large")
-    } else {
+    } else if (image_extensions.contains(extension.toLowerCase)) {
       val base = url.substring(0, dp)
       map.put("thumb", base + "__thumb" + extension)
       map.put("small", base + "__small" + extension)
