@@ -85,7 +85,7 @@ class SolrIndexDAO @Inject()(@Named("solr.home") solrHome: String,
     } else {
       if (solrServer == null) {
         logger.info("Initialising the solr server " + solrHome + " cloudserver:" + cloudServer + " solrServer:" + solrServer)
-        if (!solrHome.startsWith("http://")) {
+        if (!solrHome.startsWith("http")) {
           if (solrHome.contains(":")) {
             //assume that it represents a SolrCloud
             cloudServer = new org.apache.solr.client.solrj.impl.CloudSolrServer(solrHome)
