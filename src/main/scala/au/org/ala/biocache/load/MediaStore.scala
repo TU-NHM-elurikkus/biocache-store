@@ -39,7 +39,7 @@ trait MediaStore {
   lazy val videoParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:wmv|mp4|mpg|avi|mov)(\?.+)?)$""".r
 
   val imageExtension = Array(".jpg", ".gif", ".png", ".jpeg", "imgType=jpeg")
-  val soundExtension = Array(".wav", ".mp3", ".ogg", ".flac", ".m4a")
+  val soundExtension = Array(".wav", ".mp3", ".ogg", ".flac", ".m4a", ".aiff")
   val videoExtension = Array(".wmv", ".mp4", ".mpg", ".avi", ".mov")
 
   def isValidImageURL(url: String) = !imageParser.unapplySeq(url.trim.toLowerCase).isEmpty
@@ -577,7 +577,8 @@ object LocalMediaStore extends MediaStore {
   val extensionToMimeTypes = Map(
     "mp3" -> "audio/mpeg",
     "ogg" -> "audio/ogg",
-    "m4a" -> "audio/mp4"
+    "m4a" -> "audio/mp4",
+    "aiff" -> "audio/aiff"
   )
 
   def getSoundFormats(filePath: String): java.util.Map[String, String] = {
