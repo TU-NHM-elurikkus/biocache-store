@@ -25,7 +25,7 @@ class MapDataLoader extends DataLoader {
     values.foreach(jmap =>{
       val map = jmap.toMap[String,String]
       val uniqueTermsValues = uniqueTerms.map(t => map.getOrElse(t,""))
-      //map the keys to DWC values
+      // map the keys to DWC values
       val keys = map.keySet.toList
       val biocacheModelValues = DwC.retrieveCanonicals(keys)
       val keysToDwcMap = (keys zip biocacheModelValues).toMap

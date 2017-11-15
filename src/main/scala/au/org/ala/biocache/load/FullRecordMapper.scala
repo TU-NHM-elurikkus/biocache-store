@@ -20,12 +20,12 @@ object FullRecordMapper {
   val userAssertionStatusColumn = "userAssertionStatus"
   val geospatialDecisionColumn = "geospatiallyKosher"
   val taxonomicDecisionColumn = "taxonomicallyKosher"
-  val userVerifiedColumn ="userVerified"
-  val locationDeterminedColumn ="locationDetermined"
+  val userVerifiedColumn = "userVerified"
+  val locationDeterminedColumn = "locationDetermined"
   val defaultValuesColumn = "defaultValuesUsed"
   val alaModifiedColumn = "lastModifiedTime"
-  val dateDeletedColumn ="dateDeleted"
-  val lastUserAssertionDateColumn ="lastUserAssertionDate"
+  val dateDeletedColumn = "dateDeleted"
+  val lastUserAssertionDateColumn = "lastUserAssertionDate"
   val environmentalLayersColumn = "el.p"
   val contextualLayersColumn = "cl.p"
   val deletedColumn = "deleted"
@@ -181,7 +181,7 @@ object FullRecordMapper {
           case it if taxonomicDecisionColumn.equals(it) => fullRecord.taxonomicallyKosher = "true".equals(fieldValue)
           case it if geospatialDecisionColumn.equals(it) => fullRecord.geospatiallyKosher = "true".equals(fieldValue)
           case it if defaultValuesColumn.equals(it) => fullRecord.defaultValuesUsed = "true".equals(fieldValue)
-          case it if locationDeterminedColumn.equals(it) => fullRecord.locationDetermined ="true".equals(fieldValue)
+          case it if locationDeterminedColumn.equals(it) => fullRecord.locationDetermined = "true".equals(fieldValue)
           case it if deletedColumn.equals(it) => fullRecord.deleted = "true".equals(fieldValue)
           case it if dateDeletedColumn.equals(it) => fullRecord.dateDeleted
           case it if lastUserAssertionDateColumn.equals(fieldName) => fullRecord.setLastUserAssertionDate(fieldValue)

@@ -34,13 +34,18 @@ trait MediaStore {
   //Regular expression used to parse an image URL - adapted from
   //http://stackoverflow.com/questions/169625/regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif#169656
   //Extended to allow query parameters after the path and ftp as well as http access
-  lazy val imageParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(jpg|jpeg|gif|png)(\?.+)?)$""".r
-  lazy val soundParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:wav|mp3|ogg|flac|m4a|aiff)(\?.+)?)$""".r
-  lazy val videoParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:wmv|mp4|mpg|avi|mov)(\?.+)?)$""".r
+  lazy val imageParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(bmp|gif|ico|jpe|jpeg|jpg|png|svg)(\?.+)?)$""".r
+  lazy val soundParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:aiff|amr|flac|m4a|mp3|oga|ogg|opus|wav)(\?.+)?)$""".r
+  lazy val videoParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:3gp|avi|m4v|mov|mp4|mpg|ogm|ogv|webm|wmv)(\?.+)?)$""".r
 
-  val imageExtension = Array(".jpg", ".gif", ".png", ".jpeg", "imgType=jpeg")
-  val soundExtension = Array(".wav", ".mp3", ".ogg", ".flac", ".m4a", ".aiff")
-  val videoExtension = Array(".wmv", ".mp4", ".mpg", ".avi", ".mov")
+  /*
+  .oga, .opus .amr
+  .ogv, .ogm, .webm, .m4v, .3gp
+  */
+
+  val imageExtension = Array(".bmp", ".gif", ".ico", ".jpe", ".jpeg", ".jpg", ".png", ".svg")
+  val soundExtension = Array(".aiff", ".amr", ".flac", ".m4a", ".mp3", ".oga", ".ogg", ".opus", ".wav")
+  val videoExtension = Array(".3gp", ".avi", ".m4v", ".mov", ".mp4", ".mpg", ".ogm", ".ogv", ".webm", ".wmv")
 
   def isValidImageURL(url: String) = !imageParser.unapplySeq(url.trim.toLowerCase).isEmpty
   def isValidSoundURL(url: String) = !soundParser.unapplySeq(url.trim.toLowerCase).isEmpty
@@ -465,13 +470,12 @@ object LocalMediaStore extends MediaStore {
     val dp = url.lastIndexOf(".")
     val extension = if (dp >= 0) url.substring(dp) else ""
     val map = new util.HashMap[String, String]
-    val image_extensions = Array(".jpg", ".jpeg", ".png", ".gif")
     // some files will not have an extension - also some files are not images...
     if (extension.isEmpty()) {
       map.put("thumb", url + "__thumb")
       map.put("small", url + "__small")
       map.put("large", url + "__large")
-    } else if (image_extensions.contains(extension.toLowerCase)) {
+  } else if (imageExtension.contains(extension.toLowerCase)) {
       val base = url.substring(0, dp)
       map.put("thumb", base + "__thumb" + extension)
       map.put("small", base + "__small" + extension)
@@ -575,10 +579,15 @@ object LocalMediaStore extends MediaStore {
   }
 
   val extensionToMimeTypes = Map(
-    "mp3" -> "audio/mpeg",
-    "ogg" -> "audio/ogg",
+    "aiff" -> "audio/aiff",
+    "amr" -> "audio/amr",
+    "flac" -> "audio/flac",
     "m4a" -> "audio/mp4",
-    "aiff" -> "audio/aiff"
+    "mp3" -> "audio/mpeg",
+    "oga" -> "audio/oga",
+    "ogg" -> "audio/ogg",
+    "opus" -> "audio/opus",
+    "wav" -> "audio/wav"
   )
 
   def getSoundFormats(filePath: String): java.util.Map[String, String] = {

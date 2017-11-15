@@ -348,7 +348,7 @@ trait DataLoader {
             soundsBuffer += savedFilePathOrId
           } else if (Config.mediaStore.isValidVideo(fileToStore)) {
             videosBuffer += savedFilePathOrId
-          } else {
+          } else if (Config.mediaStore.isValidImage(fileToStore)) {
             imagesBuffer += savedFilePathOrId
           }
           associatedMediaBuffer += savedFilename
@@ -366,9 +366,8 @@ trait DataLoader {
   }
 
   /**
-   * Download an archive from the supplied URL. Includes support for downloading from
-   * SFTP server.
-   * 
+   * Download an archive from the supplied URL. Includes support for downloading from SFTP server.
+   *
    * @param url
    * @param resourceUid
    * @param lastChecked
@@ -483,14 +482,14 @@ trait DataLoader {
 
   /**
    * Download an archive from the supplied URL.
-   * 
+   *
    * @param url
    * @param resourceUid
    * @param afterDate
    * @return
    */
   def downloadStandardArchive(url:String, resourceUid:String, afterDate:Option[Date]) : (File, Date, Boolean, Boolean) = {
-    
+
     val tmpStore = new File(temporaryFileStore)
     if(!tmpStore.exists){
       FileUtils.forceMkdir(tmpStore)
