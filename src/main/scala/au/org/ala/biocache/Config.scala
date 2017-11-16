@@ -79,7 +79,7 @@ object Config {
 
   val mediaFileStore = configModule.properties.getProperty("media.dir","/data/biocache-media/")
 
-  val mediaBaseUrl = configModule.properties.getProperty("media.url","http://biocache.ala.org.au/biocache-media")
+  val mediaBaseUrl = configModule.properties.getProperty("media.url","https://demo.elurikkus.ut.ee/biocache-media")
 
   val excludeSensitiveValuesFor = configModule.properties.getProperty("exclude.sensitive.values","")
 

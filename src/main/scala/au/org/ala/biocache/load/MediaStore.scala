@@ -31,17 +31,12 @@ trait MediaStore {
 
   val logger = LoggerFactory.getLogger("MediaStore")
 
-  //Regular expression used to parse an image URL - adapted from
-  //http://stackoverflow.com/questions/169625/regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif#169656
-  //Extended to allow query parameters after the path and ftp as well as http access
+  // Regular expression used to parse an image URL - adapted from
+  // http://stackoverflow.com/questions/169625/regex-to-check-if-valid-url-that-ends-in-jpg-png-or-gif#169656
+  // Extended to allow query parameters after the path and ftp as well as http access
   lazy val imageParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(bmp|gif|ico|jpe|jpeg|jpg|png|svg)(\?.+)?)$""".r
   lazy val soundParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:aiff|amr|flac|m4a|mp3|oga|ogg|opus|wav)(\?.+)?)$""".r
   lazy val videoParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:3gp|avi|m4v|mov|mp4|mpg|ogm|ogv|webm|wmv)(\?.+)?)$""".r
-
-  /*
-  .oga, .opus .amr
-  .ogv, .ogm, .webm, .m4v, .3gp
-  */
 
   val imageExtension = Array(".bmp", ".gif", ".ico", ".jpe", ".jpeg", ".jpg", ".png", ".svg")
   val soundExtension = Array(".aiff", ".amr", ".flac", ".m4a", ".mp3", ".oga", ".ogg", ".opus", ".wav")

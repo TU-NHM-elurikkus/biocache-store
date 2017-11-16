@@ -16,9 +16,14 @@ object Multimedia {
   val FORMAT_TERM =  DcTerm.format
   val EXTENSION_PATTERN = raw"(\.[\d\w\-_]+)(\?.*)?$$".r
   val EXTENSION_MAP = Map(
-    ".jpg" -> "image/jpeg",
+    ".bmp" -> "image/bmp",
     ".gif" -> "image/gif",
-    ".png" -> "image/png"
+    ".ico" -> "image/ico",
+    ".jpe" -> "image/jpeg",
+    ".jpeg" -> "image/jpeg",
+    ".jpg" -> "image/jpeg",
+    ".png" -> "image/png",
+    ".svg" -> "image/svg"
   )
 
   /**

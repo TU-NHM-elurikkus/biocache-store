@@ -318,7 +318,7 @@ class CassandraPersistenceManager @Inject() (
     * @param startUuid, The uuid of the occurrence at which to start the paging
     */
   def pageOver(entityName:String,proc:((String, Map[String,String])=>Boolean), pageSize:Int,
-               slicePredicate:SlicePredicate, checkEmpty:Boolean=false,startUuid:String="",endUuid:String="") = {
+               slicePredicate:SlicePredicate, checkEmpty:Boolean=false,startUuid:String = "", endUuid:String = "") = {
 
     var startKey = new Bytes(startUuid.getBytes)
     val endKey = new Bytes(endUuid.getBytes)
@@ -413,31 +413,31 @@ class CassandraPersistenceManager @Inject() (
   /**
     * Pages over the records returns the columns that fit within the startColumn and endColumn range
     */
-  def pageOverColumnRange(entityName:String, proc:((String, Map[String,String])=>Boolean), startUuid:String="", endUuid:String="", pageSize:Int=1000, startColumn:String="", endColumn:String=""){
+  def pageOverColumnRange(entityName:String, proc:((String, Map[String,String])=>Boolean), startUuid:String = "", endUuid:String = "", pageSize:Int = 1000, startColumn:String = "", endColumn:String = "") {
     val slicePredicate = Selector.newColumnsPredicate(startColumn, endColumn, false, maxColumnLimit)
-    //can't use this because we want to page of the column range too just in case the number of columns > than maxColumnLimit
-    //pageOver(entityName, proc, pageSize, slicePredicate,true,startUuid=startUuid, endUuid=endUuid)
+    // can't use this because we want to page of the column range too just in case the number of columns > than maxColumnLimit
+    // pageOver(entityName, proc, pageSize, slicePredicate,true,startUuid=startUuid, endUuid=endUuid)
     var startKey = new Bytes(startUuid.getBytes)
     val endKey = new Bytes(endUuid.getBytes)
     var keyRange = Selector.newKeyRange(startKey, endKey, pageSize+1)
     var counter = 0
-    //Please note we are not paging by UTF8 because it is much slower
+    // Please note we are not paging by UTF-8 because it is much slower
     var continue = true
     var columnMap = getColumnsFromRowsWithRetries(entityName, keyRange, slicePredicate, ConsistencyLevel.ONE, 10)
 
     while (!columnMap.isEmpty && continue) {
       val columnsObj = List(columnMap.keySet.toArray : _*)
-      //convert to scala List
+      // convert to scala List
       val keys = columnsObj.asInstanceOf[List[Bytes]]
       startKey = keys.last
       keys.foreach(buuid => {
         val columnList = columnMap.get(buuid)
 
-        //now get the remaining columns for the record
+        // now get the remaining columns for the record
         var moreCols = true
         val uuid = buuid.toUTF8
 
-        //check for empty column list
+        // check for empty column list
         if(columnList != null && !columnList.isEmpty){
 
           var startCol = new String(columnList.get(columnList.size - 1).getName(), "UTF-8")
@@ -477,7 +477,7 @@ class CassandraPersistenceManager @Inject() (
     * @param proc
     * @param startUuid, The uuid of the occurrence at which to start the paging
     */
-  def pageOverAll(entityName:String, proc:((String, Map[String,String])=>Boolean),startUuid:String="", endUuid:String="", pageSize:Int = 1000) {
+  def pageOverAll(entityName:String, proc:((String, Map[String,String])=>Boolean),startUuid:String = "", endUuid:String = "", pageSize:Int = 1000) {
     val slicePredicate = Selector.newColumnsPredicateAll(true, maxColumnLimit)
     pageOver(entityName, proc, pageSize, slicePredicate,true,startUuid=startUuid, endUuid=endUuid)
   }

@@ -239,7 +239,7 @@ object AdHocParser {
     case it if (column1.isLatitude && column2.isLatitude) => Some("decimalLatitude", "decimalLongitude")
     case it if it.isInt => Some("recordNumber", "")
     case it if it.startsWith("urn") => Some("occurrenceID", "")
-    case it if it.startsWith("http://") => Some("occurrenceID", "")
+    case it if it.startsWith("http") => Some("occurrenceID", "")
     case _ => None
   }
 
@@ -281,8 +281,21 @@ object AdHocParser {
 }
 
 object AssociatedMediaExtractor {
-  val imageParser = """^(https?://(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,6}(?:/[^/#]+)+\.(?:jpg|gif|png|jpeg))$""".r
-  def unapply(str: String): Option[String] = if(!imageParser.unapplySeq(str.trim).isEmpty) Some("image") else None
+    val imageParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(bmp|gif|ico|jpe|jpeg|jpg|png|svg)(\?.+)?)$""".r
+    val soundParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:aiff|amr|flac|m4a|mp3|oga|ogg|opus|wav)(\?.+)?)$""".r
+    val videoParser = """^((?:http|https|ftp|file)s?://[^\'"<>]+?\.(?:3gp|avi|m4v|mov|mp4|mpg|ogm|ogv|webm|wmv)(\?.+)?)$""".r
+
+    def unapply(str: String): Option[String] = {
+        if (!imageParser.unapplySeq(str.trim).isEmpty) {
+            Some("image")
+        } else if (!soundParser.unapplySeq(str.trim).isEmpty) {
+            Some("sound")
+        } else if (!videoParser.unapplySeq(str.trim).isEmpty) {
+            Some("video")
+        } else {
+            None
+        }
+    }
 }
 
 object TypeStatusExtractor {
