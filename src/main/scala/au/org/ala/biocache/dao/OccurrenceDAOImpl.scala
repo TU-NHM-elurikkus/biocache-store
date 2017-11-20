@@ -392,7 +392,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * @param startKey, The row key of the occurrence at which to start the paging
     * @param endKey, The row key of the occurrence at which to end the paging
     */
-  def pageOverAllVersions(proc: ((Option[Array[FullRecord]]) => Boolean),startKey:String="", endKey:String="", pageSize: Int = 1000) {
+  def pageOverAllVersions(proc: ((Option[Array[FullRecord]]) => Boolean),startKey:String = "", endKey:String = "", pageSize: Int = 1000) {
     persistenceManager.pageOverAll(entityName, (guid, map) => {
       //retrieve all versions
       val raw = FullRecordMapper.createFullRecord(guid, map, Raw)
@@ -411,7 +411,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * @param startKey, The row key of the occurrence at which to start the paging
     * @param endKey, The row key of the occurrence at which to end the paging
     */
-  def pageOverAll(version: Version, proc: ((Option[FullRecord]) => Boolean),startKey:String="", endKey:String="", pageSize: Int = 1000) {
+  def pageOverAll(version: Version, proc: ((Option[FullRecord]) => Boolean),startKey:String = "", endKey:String = "", pageSize: Int = 1000) {
     persistenceManager.pageOverAll(entityName, (guid, map) => {
       //retrieve all versions
       val fullRecord = FullRecordMapper.createFullRecord(guid, map, version)
@@ -428,7 +428,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * @param startKey, The row key of the occurrence at which to start the paging
     * @param endKey, The row key of the occurrence at which to end the paging
     */
-  def pageOverRawProcessed(proc: (Option[(FullRecord, FullRecord)] => Boolean),startKey:String="", endKey:String="", pageSize: Int = 1000) {
+  def pageOverRawProcessed(proc: (Option[(FullRecord, FullRecord)] => Boolean),startKey:String= "", endKey:String = "", pageSize: Int = 1000) {
     persistenceManager.pageOverAll(entityName, (guid, map) => {
       //retrieve all versions
       val raw = FullRecordMapper.createFullRecord(guid, map, Versions.RAW)
@@ -447,7 +447,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     */
   def conditionalPageOverRawProcessed(proc: (Option[(FullRecord, FullRecord)] => Boolean),
                                       condition:(Map[String,String]=>Boolean),columnsToRetrieve:Array[String],
-                                      startKey:String="", endKey:String="", pageSize: Int = 1000){
+                                      startKey:String = "", endKey:String = "", pageSize: Int = 1000){
     val columns = columnsToRetrieve ++ Array("uuid","rowKey")
     persistenceManager.pageOverSelect(entityName, (guid, map)=>{
       //val deleted = map.getOrElse(FullRecordMapper.deletedColumn,"false")
