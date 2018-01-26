@@ -162,7 +162,7 @@ object IndexRecords extends Tool with IncrementalTool {
     }
     indexRange(startKey, endKey, date, checkDeleted, miscIndexProperties = miscIndexProperties, userProvidedTypeMiscIndexProperties = userProvidedTypeMiscIndexProperties, callback = callback, test=test)
     //index any remaining items before exiting
-    indexer.finaliseIndex(optimise, shutdown)  
+    indexer.finaliseIndex(optimise, shutdown)
   }
 
   def indexRange(startUuid:String, endUuid:String, startDate:Option[Date]=None, checkDeleted:Boolean=false,
@@ -285,7 +285,7 @@ object IndexRecords extends Tool with IncrementalTool {
           startTime = System.currentTimeMillis
         }
       })
-      
+
       ids += 1
       p.start
       p

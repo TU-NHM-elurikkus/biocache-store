@@ -139,7 +139,7 @@ trait IndexDAO {
     "collection_uid", "collection_code", "collection_name", "catalogue_number",
     "taxon_concept_lsid", "occurrence_date", "occurrence_date_end_dt", "occurrence_year", "occurrence_decade_i", "taxon_name", "common_name", "names_and_lsid", "common_name_and_lsid",
     "rank", "rank_id", "raw_taxon_name", "raw_common_name", "multimedia", "image_url", "all_image_url",
-    "species_group", "country_code", "country", "lft", "rgt", "kingdom", "phylum", "class", "order",
+    "species_group", "country_code", "country", "county", "municipality", "locality", "lft", "rgt", "kingdom", "phylum", "class", "order",
     "family", "genus", "genus_guid", "species", "species_guid", "state", "places", "latitude", "longitude",
     "lat_long", "point-1", "point-0.1", "point-0.01", "point-0.02", "point-0.001", "point-0.0001",
     "year", "month", "basis_of_record", "raw_basis_of_record", "type_status",
@@ -456,6 +456,9 @@ trait IndexDAO {
           speciesGroup.mkString("|"),
           getValue("countryCode", map),
           getValue("country.p", map),
+          getValue("county.p", map),
+          getValue("municipality.p", map),
+          getValue("locality.p", map),
           getValue("left.p", map),
           getValue("right.p", map),
           kingdom,
@@ -890,6 +893,12 @@ trait IndexDAO {
         addField(doc,header(i), getValue("countryCode", map))
         i = i + 1
         addField(doc,header(i), getValue("country.p", map))
+        i = i + 1
+        addField(doc,header(i), getValue("county.p", map))
+        i = i + 1
+        addField(doc,header(i), getValue("municipality.p", map))
+        i = i + 1
+        addField(doc,header(i), getValue("locality.p", map))
         i = i + 1
         addField(doc,header(i), getValue("left.p", map))
         i = i + 1

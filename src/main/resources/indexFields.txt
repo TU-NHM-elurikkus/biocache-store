@@ -33,6 +33,9 @@ raw_common_name	string	vernacularName	F	F		F
 species_group	string	speciesGroups.p	T	T		F
 country_code	string	countryCode	F	F		F
 country	string	country.p	F	F		F
+county	string	county.p	F	F		F
+municipality	string	municipality.p	F	F		F
+locality	string	locality.p	F	F		F
 lft	int	left.p	F	F		F
 rgt	int	right.p	F	F		F
 kingdom	string	kingdom.p	F	F		F

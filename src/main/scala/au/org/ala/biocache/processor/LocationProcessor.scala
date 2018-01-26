@@ -62,6 +62,10 @@ class LocationProcessor extends Processor {
             processed.location.country = Config.defaultCountry
         }
 
+        processed.location.county = raw.location.county
+        processed.location.municipality = raw.location.municipality
+        processed.location.locality = raw.location.locality
+
         // habitat, no standard vocab available
         processed.location.habitat = raw.location.habitat
 

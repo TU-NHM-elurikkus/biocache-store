@@ -8,3 +8,5 @@ target
 .classpath
 *-distribution.zip
 .DS_Store
+.ensime
+.ensime_cache/
