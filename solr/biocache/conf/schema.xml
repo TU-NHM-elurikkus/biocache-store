@@ -513,11 +513,11 @@
    <field name="occurrence_id" type="string" stored="true" multiValued="false"  />
    <field name="data_hub_uid" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="data_hub" type="string" indexed="true" stored="true" multiValued="true" />
-   
+
    <field name="data_provider_uid" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="data_provider" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="dataset_name" type="string" indexed="true" stored="true" multiValued="false" />
-   
+
    <field name="data_resource_uid" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="data_resource" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="provenance" type="string" indexed="true" stored="true" multiValued="false" />
@@ -534,7 +534,7 @@
    <field name="catalogue_number" type="string_lowercase" indexed="true" stored="true" multiValued="false"/>
    <field name="taxon_concept_lsid" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="occurrence_date" type="tdate" indexed="true" stored="true" multiValued="false"/>
-   <!-- 
+   <!--
         The easiest way to facet on years ranges is to have an extra field that stores the year as a date type.  This
         is so we don't have to perform our own calculations on an integer field
         Thus the year will be stored/indexed as a date with month 01 and date 01
@@ -544,13 +544,13 @@
    <field name="taxon_name" type="string" indexed="true" stored="true" multiValued="false"/>
    <!-- Not is use in current biocache -->
    <!-- field name="taxon_name_text" type="text_ws" indexed="true" stored="true" multiValued="false" omitNorms="false" /-->
-   
+
    <!-- Not displayed in search results -->
    <!-- field name="author" type="string" indexed="false" stored="true" multiValued="false" omitNorms="false" / -->
    <field name="common_name" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="names_and_lsid" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="common_name_and_lsid" type="string" indexed="true" stored="true" multiValued="false"/>
-   <field name="rank" type="string" indexed="true" stored="true" multiValued="false" />   
+   <field name="rank" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="rank_id" type="tint" indexed="true" stored="true" multiValued="false"  />
    <field name="raw_taxon_name" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="raw_common_name" type="string" indexed="true" stored="true" multiValued="false"  />
@@ -568,23 +568,23 @@
    <field name="country" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="lft" type="tint" indexed="true" stored="true" multiValued="false" omitNorms="true" />
    <field name="rgt" type="tint" indexed="true" stored="true" multiValued="false" omitNorms="true" />
-   
+
    <field name="kingdom" type="string" indexed="true" stored="true" multiValued="false" />
-   
+
    <field name="phylum" type="string" indexed="true" stored="true" multiValued="false"  />
-   
+
    <field name="class" type="string" indexed="true" stored="true" multiValued="false"/>
-   
+
    <field name="order" type="string" indexed="true" stored="true" multiValued="false"/>
-      
+
    <field name="family" type="string" indexed="true" stored="true" multiValued="false" />
-      
+
    <field name="genus" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="genus_guid" type="string" indexed="true" stored="true" multiValued="false" />
-   
+
    <field name="species_guid" type="string" indexed="true" stored="true" multiValued="false"  />
    <field name="species" type="string" indexed="true" stored="true" multiValued="false"  />
-   
+
    <field name="subspecies_guid" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="subspecies_name" type="string" indexed="true" stored="true" multiValued="false" />
    <!-- Not actually being used in the search -->
@@ -607,12 +607,12 @@
    <!-- field name="lat_long_precision" type="string" indexed="false" stored="true" multiValued="false" omitNorms="false" /-->
    <!-- <field name="lat_long" type="location" indexed="true" stored="true"/> Requires SOLR 1.5 -->
    <field name="lat_long" type="string" indexed="true" stored="true"/>
-   
+
    <!-- These fields are indexbut I can't see where they are being used -->
    <!--field name="cell_id" type="int" indexed="true" stored="true" multiValued="false" omitNorms="false" />
    <field name="centi_cell_id" type="int" indexed="true" stored="true" multiValued="false" omitNorms="false" />
    <field name="tenmilli_cell_id" type="int" indexed="true" stored="true" multiValued="false" omitNorms="false" /-->
-   
+
    <field name="year" type="string" indexed="true" stored="true" multiValued="false"  />
    <field name="month" type="string" indexed="true" stored="true" multiValued="false"  />
    <!-- Not displayed in search results -->
@@ -634,13 +634,13 @@
 	<field name="record_number" type="string" indexed="true" stored="true" multiValued="false" />
 	<field name="loan_date" type="tdate" indexed="true" stored="false" multiValued="false" />
 	<field name="loan_returned_date" type="tdate" indexed="true" stored="false" multiValued="false" />
-	
+
 	<!--  stores phenology from AVH  -->
 	<field name="life_stage" type="textgen" indexed="true" stored="false" multiValued="false" />
 
    <field name="identified_by" type="string" indexed="true" stored="false" multiValued="false" omitNorms="false" />
    <field name="identified_date" type="tdate" indexed="true" stored="false" multiValued="false" omitNorms="false" />
-   
+
    <!-- TODO work out the extra search fields that are required for the issues -->
    <field name="taxonomic_kosher" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true" />
    <field name="geospatial_kosher" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true" />
@@ -662,8 +662,8 @@
    <field name="raw_latitude" type="string" indexed="false" stored="true" multiValued="true" />
    <field name="raw_longitude" type="string" indexed="false" stored="true" multiValued="true" />
    <field name="raw_sex" type="string" indexed="true" stored="true" multiValued="true" />
-  
-   <!-- Not displayed in search results -->   
+
+   <!-- Not displayed in search results -->
    <!-- field name="created_date" type="tdate" indexed="false" stored="true" multiValued="false" omitNorms="false" />
    <field name="modified_date" type="tdate" indexed="false" stored="true" multiValued="false" omitNorms="false" / -->
    <!-- This is for Citzen Science records only -->
@@ -678,11 +678,11 @@
    <field name="location_remarks" type="string" indexed="false" stored="false" multiValued="false" />
    <field name="occurrence_remarks" type="string" indexed="false" stored="false" multiValued="false" />
    <field name="citation" type="string" indexed="false" stored="true" multiValued="false"  />
-   
+
    <!-- I don't think that we need this field - we can always add it later. -->
    <!--field name="confidence" type="int" indexed="true" stored="true" multiValued="false" omitNorms="false" /-->
    <field name="systemAssertions" type="string" indexed="true" stored="true" multiValued="true" omitNorms="false" />
-   
+
    <field name="last_assertion_date" type="tdate" indexed="true" stored="false" multiValued="false" />
    <field name="last_load_date" type="tdate" indexed="true" stored="false" multiValued="false" />
    <field name="last_processed_date" type="tdate" indexed="true" stored="false" multiValued="false" />
@@ -729,7 +729,7 @@
    <field name="query_assertion_uuid" type="string" indexed="true" stored="true" multiValued="true" omitNorms="true" />
    <field name="query_assertion_type_s" type="string" indexed="true" stored="true" multiValued="true" omitNorms="true" />
 
-<!-- SOLR 4.0 Spatial Fields -->   
+<!-- SOLR 4.0 Spatial Fields -->
    <field name="quad"     type="quad"     indexed="true" stored="true"  multiValued="false" />
    <field name="geohash"  type="geohash"  indexed="true" stored="true"  multiValued="false" />
 
@@ -737,14 +737,14 @@
    <dynamicField name="*_s" type="string" indexed="true" stored="false" omitNorms="true" />
    <dynamicField name="*_d" type="double" indexed="true" stored="true" omitNorms="true" />
    <dynamicField name="*_d_rng" type="tdouble" indexed="true" stored="false" omitNorms="true" />
-   <dynamicField name="*_i" type="int" indexed="true" stored="true" omitNorms="true" /> 
+   <dynamicField name="*_i" type="int" indexed="true" stored="true" omitNorms="true" />
    <dynamicField name="*_i_rng" type="tint" indexed="true" stored="false" omitNorms="true" />
    <dynamicField name="*_id"  type="string" indexed="true" stored="true"/>
    <dynamicField name="*_name"  type="string" indexed="true" stored="true"/>
    <dynamicField name="point-*" type="string" indexed="true" stored="true"/>
    <dynamicField name="*conservation" type="string" indexed="true" stored="true" />
    <dynamicField name="loan_*" type="string" indexed="true" stored="false" />
-  
+
    <dynamicField name="*_uid" type="string" indexed="true" stored="true"/>
    <dynamicField name="*_uuid" type="string" indexed="true" stored="true"/>
    <!--  catches all the environment and contextual layers that are being indexed -->
@@ -752,9 +752,9 @@
    <dynamicField name="el*" type="double" indexed="true" stored="true" omitNorms="true" />
    <dynamicField name="cl*" type="string" indexed="true" stored="true" omitNorms="true" />
    <dynamicField name="dr*" type="string" indexed="true" stored="false" omitNorms="true" />
-     
+
    <dynamicField name="*_dt" type="tdate" indexed="true" stored="true" omitNorms="true" />
-   
+
 
    <!-- catchall text field that indexes tokens both normally and in reverse for efficient
         leading wildcard queries. -->
@@ -809,7 +809,7 @@
    <copyField source="identified_by" dest="identified_by_text"/>
    <copyField source="*_d" dest="*_d_rng"/>
    <copyField source="*_i" dest="*_i_rng"/>
-   
+
    <!--  This copy field is not in use anywhere -->
    <!--copyField source="taxon_name" dest="taxon_name_text"/-->
    <copyField source="common_name" dest="text"/>
@@ -820,7 +820,7 @@
    <copyField source="raw_type_status" dest="text" />
    <copyField source="collector" dest="text" />
    <copyField source="user_id"  dest="text" />
-   
+
    <copyField source="*conservation" dest="text" />
 
    <copyField source="imcra" dest="biogeographic_region" />
@@ -841,7 +841,7 @@
    <copyField source="raw_basis_of_record" dest="text" />
    <copyField source="type_status" dest="text" />
    <copyField source="raw_type_status"  dest="text"/>
-   
+
    <!-- add the remarks to the text search field -->
    <copyField source="location_remarks" dest="rem_text" />
    <copyField source="occurrence_remarks" dest="rem_text"/>
