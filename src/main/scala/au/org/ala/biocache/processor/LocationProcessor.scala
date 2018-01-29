@@ -62,10 +62,6 @@ class LocationProcessor extends Processor {
             processed.location.country = Config.defaultCountry
         }
 
-        processed.location.county = raw.location.county
-        processed.location.municipality = raw.location.municipality
-        processed.location.locality = raw.location.locality
-
         // habitat, no standard vocab available
         processed.location.habitat = raw.location.habitat
 
@@ -94,6 +90,11 @@ class LocationProcessor extends Processor {
 
     // process state/country values if coordinates not determined
     processStateCountryValues(raw, processed, assertions)
+
+    // Process other locality info
+    processed.location.county = raw.location.county
+    processed.location.municipality = raw.location.municipality
+    processed.location.locality = raw.location.locality
 
     // validate the geo-reference values
     validateGeoreferenceValues(raw, processed, assertions)
