@@ -454,6 +454,7 @@ trait IndexDAO {
           if (!images.isEmpty) images(0) else "",
           images.mkString("|"),
           speciesGroup.mkString("|"),
+          getValue("individualCount", map),
           getValue("countryCode", map),
           getValue("country.p", map),
           getValue("county.p", map),
