@@ -31,6 +31,7 @@ raw_common_name	string	vernacularName	F	F		F
 # multimedia - if length of images.p > 3 then Multimedia else None	F
 # image_url	- images.p(0)
 species_group	string	speciesGroups.p	T	T		F
+individual_count    string  individualCount F   F       F
 country_code	string	countryCode	F	F		F
 country	string	country.p	F	F		F
 county	string	county.p	F	F		F
