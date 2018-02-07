@@ -152,7 +152,7 @@ trait IndexDAO {
     "identified_by", "identified_date", "sensitive_longitude", "sensitive_latitude", "pest_flag_s", "collectors", "duplicate_status", "duplicate_record",
     "duplicate_type", "sensitive_coordinate_uncertainty", "distance_outside_expert_range", "elevation_d", "min_elevation_d", "max_elevation_d",
     "depth_d", "min_depth_d", "max_depth_d", "name_parse_type_s","occurrence_status_s", "occurrence_details", "photographer_s", "rights",
-    "raw_geo_validation_status_s", "raw_occurrence_status_s", "raw_locality","raw_latitude","raw_longitude","raw_datum","raw_sex",
+    "raw_geo_validation_status_s", "raw_occurrence_status_s", "raw_locality","raw_latitude","raw_longitude","raw_datum","raw_sex", "life_stage", "behavior",
     "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s","license", "rightsholder") ::: Config.additionalFieldsToIndex
 
   /**
@@ -561,6 +561,8 @@ trait IndexDAO {
           map.getOrElse("decimalLongitude",""),
           map.getOrElse("geodeticDatum",""),
           map.getOrElse("sex",""),
+          map.getOrElse("lifeStage", ""),
+          map.getOrElse("behavior", ""),
           sensitiveMap.getOrElse("locality", ""),
           map.getOrElse("eventID",""),
           map.getOrElse("locationID",""),
@@ -1112,6 +1114,10 @@ trait IndexDAO {
         addField(doc,header(i), map.getOrElse("geodeticDatum", ""))
         i = i + 1
         addField(doc,header(i), map.getOrElse("sex", ""))
+        i = i + 1
+        addField(doc,header(i), map.getOrElse("lifeStage", ""))
+        i = i + 1
+        addField(doc,header(i), map.getOrElse("behavior", ""))
         i = i + 1
         addField(doc,header(i), sensitiveMap.getOrElse("locality", ""))
         i = i + 1
