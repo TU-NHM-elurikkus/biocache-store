@@ -127,6 +127,8 @@ raw_latitude	string	decimalLatitude	F	F		F
 raw_longitude	string	decimalLongitude	F	F		F
 raw_locality	string	locality	F	F		F
 raw_sex	string	sex	F	F		F
+life_stage	string	lifeStage	F	F		F
+behavior	string	behavior	F	F		F
 raw_datum	string	geodeticDatum	F	F		F
 collector_text	string	recordedBy	F	F		F
 collectors	string	recordedBy.p	F	F		F
