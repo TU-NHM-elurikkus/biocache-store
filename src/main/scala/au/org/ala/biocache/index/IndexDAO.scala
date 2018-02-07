@@ -150,15 +150,15 @@ trait IndexDAO {
       "interaction", "last_assertion_date", "last_load_date", "last_processed_date", "modified_date",
       "establishment_means", "loan_number", "loan_identifier", "loan_destination", "loan_botanist", "loan_date",
       "loan_return_date", "original_name_usage", "duplicate_inst", "record_number", "first_loaded_date",
-      "name_match_metric", "life_stage", "outlier_layer", "outlier_layer_count", "taxonomic_issue",
-      "raw_identification_qualifier", "identification_qualifier_s", "species_habitats", "identified_by",
-      "identified_date", "sensitive_longitude", "sensitive_latitude", "pest_flag_s", "collectors", "duplicate_status",
-      "duplicate_record", "duplicate_type", "sensitive_coordinate_uncertainty", "distance_outside_expert_range",
-      "elevation_d", "min_elevation_d", "max_elevation_d", "depth_d", "min_depth_d", "max_depth_d", "name_parse_type_s",
-      "occurrence_status_s", "occurrence_details", "photographer_s", "rights", "raw_geo_validation_status_s",
-      "raw_occurrence_status_s", "raw_locality", "raw_latitude", "raw_longitude", "raw_datum", "raw_sex", "life_stage",
-      "behavior", "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s",
-      "license", "rightsholder",
+      "name_match_metric", "outlier_layer", "outlier_layer_count", "taxonomic_issue", "raw_identification_qualifier",
+      "identification_qualifier_s", "species_habitats", "identified_by", "identified_date", "sensitive_longitude",
+      "sensitive_latitude", "pest_flag_s", "collectors", "duplicate_status", "duplicate_record", "duplicate_type",
+      "sensitive_coordinate_uncertainty", "distance_outside_expert_range", "elevation_d", "min_elevation_d",
+      "max_elevation_d", "depth_d", "min_depth_d", "max_depth_d", "name_parse_type_s", "occurrence_status_s",
+      "occurrence_details", "photographer_s", "rights", "raw_geo_validation_status_s", "raw_occurrence_status_s",
+      "raw_locality", "raw_latitude", "raw_longitude", "raw_datum", "raw_sex", "life_stage", "behavior",
+      "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s", "license",
+      "rightsholder"
   ) ::: Config.additionalFieldsToIndex
 
   /**
@@ -531,7 +531,6 @@ trait IndexDAO {
           map.getOrElse("recordNumber", ""),
           if (firstLoadDate.isEmpty) "" else DateFormatUtils.format(firstLoadDate.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"),
           map.getOrElse("nameMatchMetric.p", ""),
-          map.getOrElse("phenology", ""), //TODO make this a controlled vocab that gets mapped during processing...
           outlierForLayers.mkString("|"),
           outlierForLayers.length.toString,
           taxonIssueArray.mkString("|"),
@@ -1039,8 +1038,6 @@ trait IndexDAO {
         i += 1
         addField(doc, header(i), map.getOrElse("nameMatchMetric.p", ""))
         i += 1
-        addField(doc, header(i), map.getOrElse("phenology", ""))
-        i += 1 //TODO make this a controlled vocab that gets mapped during processing...
         if (outlierForLayers != null)
           for (j <- outlierForLayers)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)

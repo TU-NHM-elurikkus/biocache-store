@@ -103,7 +103,6 @@ duplicate_inst	string	duplicates	T	F		F
 record_number	string	recordNumber	F	F		F
 first_loaded_date	date	firstLoaded	F	F		F
 name_match_metric	string	nameMatchMetric.p	F	F		F
-life_stage	string	phenology	F	F		F
 outlier_layer	string	outlierForLayers.p	T	T		F
 # outlier_layer_count - based on the count in outlier_layer	F
 taxonomic_issue	string	taxonomicIssue.p	F	F		F

@@ -611,10 +611,6 @@
         <field name="loan_date" type="tdate" indexed="true" stored="false" multiValued="false" />
         <field name="loan_returned_date" type="tdate" indexed="true" stored="false" multiValued="false" />
 
-        <!-- stores phenology from AVH -->
-        <field name="life_stage" type="textgen" indexed="true" stored="false" multiValued="false" />
-
-
         <field name="identified_by" type="string" indexed="true" stored="false" multiValued="false" omitNorms="false" />
         <field name="identified_date" type="tdate" indexed="true" stored="false" multiValued="false" omitNorms="false" />
 
