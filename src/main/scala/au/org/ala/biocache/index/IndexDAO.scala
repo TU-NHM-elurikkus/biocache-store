@@ -134,26 +134,32 @@ trait IndexDAO {
   /**
    * The header values for the CSV file.
    */
-  lazy val header = List("id", "row_key", "occurrence_id", "data_hub_uid", "data_hub", "data_provider_uid", "data_provider", "data_resource_uid",
-    "data_resource", "institution_uid", "institution_code", "institution_name",
-    "collection_uid", "collection_code", "collection_name", "catalogue_number",
-    "taxon_concept_lsid", "occurrence_date", "occurrence_date_end_dt", "occurrence_year", "occurrence_decade_i", "taxon_name", "common_name", "names_and_lsid", "common_name_and_lsid",
-    "rank", "rank_id", "raw_taxon_name", "raw_common_name", "multimedia", "image_url", "all_image_url",
-    "species_group", "individual_count", "country_code", "country", "county", "municipality", "locality", "lft", "rgt", "kingdom", "phylum", "class", "order",
-    "family", "genus", "genus_guid", "species", "species_guid", "state", "places", "latitude", "longitude",
-    "lat_long", "point-1", "point-0.1", "point-0.01", "point-0.02", "point-0.001", "point-0.0001",
-    "year", "month", "basis_of_record", "raw_basis_of_record", "type_status",
-    "raw_type_status", "taxonomic_kosher", "geospatial_kosher",  "location_remarks",
-    "occurrence_remarks", "user_assertions", "collector", "state_conservation", "raw_state_conservation", "country_conservation", "raw_country_conservation",
-    "sensitive", "coordinate_uncertainty", "user_id", "alau_user_id", "provenance", "subspecies_guid", "subspecies_name", "interaction", "last_assertion_date",
-    "last_load_date", "last_processed_date", "modified_date", "establishment_means", "loan_number", "loan_identifier", "loan_destination",
-    "loan_botanist", "loan_date", "loan_return_date", "original_name_usage", "duplicate_inst", "record_number", "first_loaded_date", "name_match_metric",
-    "life_stage", "outlier_layer", "outlier_layer_count", "taxonomic_issue", "raw_identification_qualifier", "identification_qualifier_s", "species_habitats",
-    "identified_by", "identified_date", "sensitive_longitude", "sensitive_latitude", "pest_flag_s", "collectors", "duplicate_status", "duplicate_record",
-    "duplicate_type", "sensitive_coordinate_uncertainty", "distance_outside_expert_range", "elevation_d", "min_elevation_d", "max_elevation_d",
-    "depth_d", "min_depth_d", "max_depth_d", "name_parse_type_s","occurrence_status_s", "occurrence_details", "photographer_s", "rights",
-    "raw_geo_validation_status_s", "raw_occurrence_status_s", "raw_locality","raw_latitude","raw_longitude","raw_datum","raw_sex", "life_stage", "behavior",
-    "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s","license", "rightsholder") ::: Config.additionalFieldsToIndex
+  lazy val header = List("id", "row_key", "occurrence_id", "data_hub_uid", "data_hub", "data_provider_uid",
+      "data_provider", "data_resource_uid", "data_resource", "institution_uid", "institution_code", "institution_name",
+      "collection_uid", "collection_code", "collection_name", "catalogue_number", "taxon_concept_lsid",
+      "occurrence_date", "occurrence_date_end_dt", "occurrence_year", "occurrence_decade_i", "taxon_name",
+      "common_name", "names_and_lsid", "common_name_and_lsid", "rank", "rank_id", "raw_taxon_name", "raw_common_name",
+      "multimedia", "image_url", "all_image_url", "species_group", "individual_count", "country_code", "country",
+      "county", "municipality", "locality", "lft", "rgt", "kingdom", "phylum", "class", "order", "family", "genus",
+      "genus_guid", "species", "species_guid", "state", "places", "latitude", "longitude", "lat_long", "point-1",
+      "point-0.1", "point-0.01", "point-0.02", "point-0.001", "point-0.0001", "year", "month", "basis_of_record",
+      "raw_basis_of_record", "type_status", "raw_type_status", "taxonomic_kosher", "geospatial_kosher",
+      "location_remarks", "occurrence_remarks", "user_assertions", "collector", "state_conservation",
+      "raw_state_conservation", "country_conservation", "raw_country_conservation", "sensitive",
+      "coordinate_uncertainty", "user_id", "alau_user_id", "provenance", "subspecies_guid", "subspecies_name",
+      "interaction", "last_assertion_date", "last_load_date", "last_processed_date", "modified_date",
+      "establishment_means", "loan_number", "loan_identifier", "loan_destination", "loan_botanist", "loan_date",
+      "loan_return_date", "original_name_usage", "duplicate_inst", "record_number", "first_loaded_date",
+      "name_match_metric", "life_stage", "outlier_layer", "outlier_layer_count", "taxonomic_issue",
+      "raw_identification_qualifier", "identification_qualifier_s", "species_habitats", "identified_by",
+      "identified_date", "sensitive_longitude", "sensitive_latitude", "pest_flag_s", "collectors", "duplicate_status",
+      "duplicate_record", "duplicate_type", "sensitive_coordinate_uncertainty", "distance_outside_expert_range",
+      "elevation_d", "min_elevation_d", "max_elevation_d", "depth_d", "min_depth_d", "max_depth_d", "name_parse_type_s",
+      "occurrence_status_s", "occurrence_details", "photographer_s", "rights", "raw_geo_validation_status_s",
+      "raw_occurrence_status_s", "raw_locality", "raw_latitude", "raw_longitude", "raw_datum", "raw_sex", "life_stage",
+      "behavior", "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s",
+      "license", "rightsholder",
+  ) ::: Config.additionalFieldsToIndex
 
   /**
    * sensitive csv header columns
@@ -495,7 +501,7 @@ trait IndexDAO {
           getValue("locationRemarks", map),
           getValue("occurrenceRemarks", map),
           hasUserAss,
-          //  userAssertionStatus,
+          // userAssertionStatus,
           getValue("recordedBy", map),
           stateCons, //stat
           rawStateCons,
@@ -549,24 +555,24 @@ trait IndexDAO {
           map.getOrElse("verbatimDepth.p", ""),
           map.getOrElse("minimumDepthInMeters.p", ""),
           map.getOrElse("maximumDepthInMeters.p", ""),
-          map.getOrElse("nameParseType.p",""),
-          map.getOrElse("occurrenceStatus.p",""),
-          map.getOrElse("occurrenceDetails",""),
-          map.getOrElse("photographer",""),
-          map.getOrElse("rights",""),
-          map.getOrElse("georeferenceVerificationStatus",""),
+          map.getOrElse("nameParseType.p", ""),
+          map.getOrElse("occurrenceStatus.p", ""),
+          map.getOrElse("occurrenceDetails", ""),
+          map.getOrElse("photographer", ""),
+          map.getOrElse("rights", ""),
+          map.getOrElse("georeferenceVerificationStatus", ""),
           map.getOrElse("occurrenceStatus", ""),
-          map.getOrElse("locality",""),
-          map.getOrElse("decimalLatitude",""),
-          map.getOrElse("decimalLongitude",""),
-          map.getOrElse("geodeticDatum",""),
-          map.getOrElse("sex",""),
+          map.getOrElse("locality", ""),
+          map.getOrElse("decimalLatitude", ""),
+          map.getOrElse("decimalLongitude", ""),
+          map.getOrElse("geodeticDatum", ""),
+          map.getOrElse("sex", ""),
           map.getOrElse("lifeStage", ""),
           map.getOrElse("behavior", ""),
           sensitiveMap.getOrElse("locality", ""),
-          map.getOrElse("eventID",""),
-          map.getOrElse("locationID",""),
-          map.getOrElse("datasetName",""),
+          map.getOrElse("eventID", ""),
+          map.getOrElse("locationID", ""),
+          map.getOrElse("datasetName", ""),
           map.getOrElse("reproductiveCondition", ""),
           map.getOrElse("license.p", ""),
           map.getOrElse("rightsholder", "")
@@ -818,321 +824,321 @@ trait IndexDAO {
         }
 
         var i: Integer = 0
-        addField(doc,header(i), getValue("uuid", map))
-        i = i + 1
-        addField(doc,header(i), getValue("rowKey", map))
-        i = i + 1
-        addField(doc,header(i), getValue("occurrenceID", map))
-        i = i + 1
+        addField(doc, header(i), getValue("uuid", map))
+        i += 1
+        addField(doc, header(i), getValue("rowKey", map))
+        i += 1
+        addField(doc, header(i), getValue("occurrenceID", map))
+        i += 1
         if (dataHubUids != null)
           for (j <- dataHubUids)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
-        addField(doc,header(i), getValue("dataHub.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("dataProviderUid", map, true))
-        i = i + 1
-        addField(doc,header(i), getValue("dataProviderName", map, true))
-        i = i + 1
-        addField(doc,header(i), getValue("dataResourceUid", map, true))
-        i = i + 1
-        addField(doc,header(i), getValue("dataResourceName", map, true))
-        i = i + 1
-        addField(doc,header(i), getValue("institutionUid.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("institutionCode", map))
-        i = i + 1
-        addField(doc,header(i), getValue("institutionName.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("collectionUid.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("collectionCode", map))
-        i = i + 1
-        addField(doc,header(i), getValue("collectionName.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("catalogNumber", map))
-        i = i + 1
-        addField(doc,header(i), taxonConceptId)
-        i = i + 1
-        addField(doc,header(i), if (eventDate != "") eventDate + "T00:00:00Z" else "")
-        i = i + 1
-        addField(doc,header(i), if (eventDateEnd != "") eventDateEnd + "T00:00:00Z" else "")
-        i = i + 1
-        addField(doc,header(i), occurrenceYear)
-        i = i + 1
-        addField(doc,header(i), occurrenceDecade)
-        i = i + 1
-        addField(doc,header(i), sciName)
-        i = i + 1
-        addField(doc,header(i), vernacularName)
-        i = i + 1
-        addField(doc,header(i), sciName + "|" + taxonConceptId + "|" + vernacularName + "|" + kingdom + "|" + family)
-        i = i + 1
-        addField(doc,header(i), vernacularName + "|" + sciName + "|" + taxonConceptId + "|" + vernacularName + "|" + kingdom + "|" + family)
-        i = i + 1
-        addField(doc,header(i), getValue("taxonRank.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("taxonRankID.p", map))
-        i = i + 1
-        addField(doc,header(i), getRawScientificName(map))
-        i = i + 1
-        addField(doc,header(i), getValue("vernacularName", map))
-        i = i + 1
+        i += 1
+        addField(doc, header(i), getValue("dataHub.p", map))
+        i += 1
+        addField(doc, header(i), getValue("dataProviderUid", map, true))
+        i += 1
+        addField(doc, header(i), getValue("dataProviderName", map, true))
+        i += 1
+        addField(doc, header(i), getValue("dataResourceUid", map, true))
+        i += 1
+        addField(doc, header(i), getValue("dataResourceName", map, true))
+        i += 1
+        addField(doc, header(i), getValue("institutionUid.p", map))
+        i += 1
+        addField(doc, header(i), getValue("institutionCode", map))
+        i += 1
+        addField(doc, header(i), getValue("institutionName.p", map))
+        i += 1
+        addField(doc, header(i), getValue("collectionUid.p", map))
+        i += 1
+        addField(doc, header(i), getValue("collectionCode", map))
+        i += 1
+        addField(doc, header(i), getValue("collectionName.p", map))
+        i += 1
+        addField(doc, header(i), getValue("catalogNumber", map))
+        i += 1
+        addField(doc, header(i), taxonConceptId)
+        i += 1
+        addField(doc, header(i), if (eventDate != "") eventDate + "T00:00:00Z" else "")
+        i += 1
+        addField(doc, header(i), if (eventDateEnd != "") eventDateEnd + "T00:00:00Z" else "")
+        i += 1
+        addField(doc, header(i), occurrenceYear)
+        i += 1
+        addField(doc, header(i), occurrenceDecade)
+        i += 1
+        addField(doc, header(i), sciName)
+        i += 1
+        addField(doc, header(i), vernacularName)
+        i += 1
+        addField(doc, header(i), sciName + "|" + taxonConceptId + "|" + vernacularName + "|" + kingdom + "|" + family)
+        i += 1
+        addField(doc, header(i), vernacularName + "|" + sciName + "|" + taxonConceptId + "|" + vernacularName + "|" + kingdom + "|" + family)
+        i += 1
+        addField(doc, header(i), getValue("taxonRank.p", map))
+        i += 1
+        addField(doc, header(i), getValue("taxonRankID.p", map))
+        i += 1
+        addField(doc, header(i), getRawScientificName(map))
+        i += 1
+        addField(doc, header(i), getValue("vernacularName", map))
+        i += 1
         //if (!images.isEmpty && images(0) != "") "Multimedia" else "None"
         if (multimedia != null)
           for (j <- multimedia)
-            if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
+            if (StringUtils.isNotEmpty(j)) addField(doc, header(i), j)
+        i += 1
         addField(doc,header(i), if (!images.isEmpty) images(0) else "")
-        i = i + 1
+        i += 1
         if (images != null)
           for (j <- images)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
+        i += 1
         if (speciesGroup != null && speciesGroup.length > 0)
           for (j <- speciesGroup)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
-        addField(doc,header(i), getValue("countryCode", map))
-        i = i + 1
-        addField(doc,header(i), getValue("country.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("county.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("municipality.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("locality.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("left.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("right.p", map))
-        i = i + 1
-        addField(doc,header(i), kingdom)
-        i = i + 1
-        addField(doc,header(i), getValue("phylum.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("classs.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("order.p", map))
-        i = i + 1
-        addField(doc,header(i), family)
-        i = i + 1
-        addField(doc,header(i), getValue("genus.p", map))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("genusID.p", ""))
-        i = i + 1
-        addField(doc,header(i), getValue("species.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("speciesID.p", map))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("stateProvince.p", ""))
-        i = i + 1
-        addField(doc,header(i), getValue("lga.p", map))
-        i = i + 1
-        addField(doc,header(i), slat)
-        i = i + 1
-        addField(doc,header(i), slon)
-        i = i + 1
-        addField(doc,header(i), latlon)
-        i = i + 1
-        addField(doc,header(i), getLatLongString(lat, lon, "#"))
-        i = i + 1
-        addField(doc,header(i), getLatLongString(lat, lon, "#.#"))
-        i = i + 1
-        addField(doc,header(i), getLatLongString(lat, lon, "#.##"))
-        i = i + 1
-        addField(doc,header(i), getLatLongStringStep(lat, lon, "#.##", 0.02))
-        i = i + 1
-        addField(doc,header(i), getLatLongString(lat, lon, "#.###"))
-        i = i + 1
-        addField(doc,header(i), getLatLongString(lat, lon, "#.####"))
-        i = i + 1
-        addField(doc,header(i), getValue("year.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("month.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("basisOfRecord.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("basisOfRecord", map))
-        i = i + 1
-        addField(doc,header(i), getValue("typeStatus.p", map))
-        i = i + 1
-        addField(doc,header(i), getValue("typeStatus", map))
-        i = i + 1
-        addField(doc,header(i), getValue(FullRecordMapper.taxonomicDecisionColumn, map))
-        i = i + 1
-        addField(doc,header(i), geoKosher)
-        i = i + 1
+        i += 1
+        addField(doc, header(i), getValue("countryCode", map))
+        i += 1
+        addField(doc, header(i), getValue("country.p", map))
+        i += 1
+        addField(doc, header(i), getValue("county.p", map))
+        i += 1
+        addField(doc, header(i), getValue("municipality.p", map))
+        i += 1
+        addField(doc, header(i), getValue("locality.p", map))
+        i += 1
+        addField(doc, header(i), getValue("left.p", map))
+        i += 1
+        addField(doc, header(i), getValue("right.p", map))
+        i += 1
+        addField(doc, header(i), kingdom)
+        i += 1
+        addField(doc, header(i), getValue("phylum.p", map))
+        i += 1
+        addField(doc, header(i), getValue("classs.p", map))
+        i += 1
+        addField(doc, header(i), getValue("order.p", map))
+        i += 1
+        addField(doc, header(i), family)
+        i += 1
+        addField(doc, header(i), getValue("genus.p", map))
+        i += 1
+        addField(doc, header(i), map.getOrElse("genusID.p", ""))
+        i += 1
+        addField(doc, header(i), getValue("species.p", map))
+        i += 1
+        addField(doc, header(i), getValue("speciesID.p", map))
+        i += 1
+        addField(doc, header(i), map.getOrElse("stateProvince.p", ""))
+        i += 1
+        addField(doc, header(i), getValue("lga.p", map))
+        i += 1
+        addField(doc, header(i), slat)
+        i += 1
+        addField(doc, header(i), slon)
+        i += 1
+        addField(doc, header(i), latlon)
+        i += 1
+        addField(doc, header(i), getLatLongString(lat, lon, "#"))
+        i += 1
+        addField(doc, header(i), getLatLongString(lat, lon, "#.#"))
+        i += 1
+        addField(doc, header(i), getLatLongString(lat, lon, "#.##"))
+        i += 1
+        addField(doc, header(i), getLatLongStringStep(lat, lon, "#.##", 0.02))
+        i += 1
+        addField(doc, header(i), getLatLongString(lat, lon, "#.###"))
+        i += 1
+        addField(doc, header(i), getLatLongString(lat, lon, "#.####"))
+        i += 1
+        addField(doc, header(i), getValue("year.p", map))
+        i += 1
+        addField(doc, header(i), getValue("month.p", map))
+        i += 1
+        addField(doc, header(i), getValue("basisOfRecord.p", map))
+        i += 1
+        addField(doc, header(i), getValue("basisOfRecord", map))
+        i += 1
+        addField(doc, header(i), getValue("typeStatus.p", map))
+        i += 1
+        addField(doc, header(i), getValue("typeStatus", map))
+        i += 1
+        addField(doc, header(i), getValue(FullRecordMapper.taxonomicDecisionColumn, map))
+        i += 1
+        addField(doc, header(i), geoKosher)
+        i += 1
         //NC 2013-05-23: Assertions are now values, failed, passed and untested these will be handled separately
-        addField(doc,header(i), getValue("locationRemarks", map))
-        i = i + 1
-        addField(doc,header(i), getValue("occurrenceRemarks", map))
-        i = i + 1
-        addField(doc,header(i), hasUserAss)
-        i = i + 1
+        addField(doc, header(i), getValue("locationRemarks", map))
+        i += 1
+        addField(doc, header(i), getValue("occurrenceRemarks", map))
+        i += 1
+        addField(doc, header(i), hasUserAss)
+        i += 1
         //  userAssertionStatu
-        addField(doc,header(i), getValue("recordedBy", map))
-        i = i + 1
-        addField(doc,header(i), stateCons)
-        i = i + 1 //stat
-        addField(doc,header(i), rawStateCons)
-        i = i + 1
-        addField(doc,header(i), countryCons)
-        i = i + 1
-        addField(doc,header(i), rawCountryCons)
-        i = i + 1
-        addField(doc,header(i), sensitive)
-        i = i + 1
-        addField(doc,header(i), getValue("coordinateUncertaintyInMeters.p", map))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("userId", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("userId", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("provenance.p", ""))
-        i = i + 1
-        addField(doc,header(i), subspeciesGuid)
-        i = i + 1
-        addField(doc,header(i), subspeciesName)
-        i = i + 1
+        addField(doc, header(i), getValue("recordedBy", map))
+        i += 1
+        addField(doc, header(i), stateCons)
+        i += 1 //stat
+        addField(doc, header(i), rawStateCons)
+        i += 1
+        addField(doc, header(i), countryCons)
+        i += 1
+        addField(doc, header(i), rawCountryCons)
+        i += 1
+        addField(doc, header(i), sensitive)
+        i += 1
+        addField(doc, header(i), getValue("coordinateUncertaintyInMeters.p", map))
+        i += 1
+        addField(doc, header(i), map.getOrElse("userId", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("userId", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("provenance.p", ""))
+        i += 1
+        addField(doc, header(i), subspeciesGuid)
+        i += 1
+        addField(doc, header(i), subspeciesName)
+        i += 1
         if (interactions != null)
           for (j <- interactions)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
-        addField(doc,header(i), if (lastUserAssertion.isEmpty) "" else DateFormatUtils.format(lastUserAssertion.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
-        addField(doc,header(i), if (lastLoaded.isEmpty) "2010-11-1T00:00:00Z" else DateFormatUtils.format(lastLoaded.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
-        addField(doc,header(i), if (lastProcessed.isEmpty) "" else DateFormatUtils.format(lastProcessed.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
-        addField(doc,header(i), if (modifiedDate.isEmpty) "" else DateFormatUtils.format(modifiedDate.get, "yyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
+        i += 1
+        addField(doc, header(i), if (lastUserAssertion.isEmpty) "" else DateFormatUtils.format(lastUserAssertion.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
+        addField(doc, header(i), if (lastLoaded.isEmpty) "2010-11-1T00:00:00Z" else DateFormatUtils.format(lastLoaded.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
+        addField(doc, header(i), if (lastProcessed.isEmpty) "" else DateFormatUtils.format(lastProcessed.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
+        addField(doc, header(i), if (modifiedDate.isEmpty) "" else DateFormatUtils.format(modifiedDate.get, "yyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
         for (v1 <- map.getOrElse("establishmentMeans.p", "").split("; "))
           if (StringUtils.isNotEmpty(v1)) addField(doc,header(i), v1)
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("loanSequenceNumber", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("loanIdentifier", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("loanDestination", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("loanForBotanist", ""))
-        i = i + 1
-        addField(doc,header(i), if (loanDate.isEmpty) "" else DateFormatUtils.format(loanDate.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
-        addField(doc,header(i), if (loanReturnDate.isEmpty) "" else DateFormatUtils.format(loanReturnDate.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("originalNameUsage", map.getOrElse("typifiedName", "")))
-        i = i + 1
+        i += 1
+        addField(doc, header(i), map.getOrElse("loanSequenceNumber", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("loanIdentifier", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("loanDestination", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("loanForBotanist", ""))
+        i += 1
+        addField(doc, header(i), if (loanDate.isEmpty) "" else DateFormatUtils.format(loanDate.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
+        addField(doc, header(i), if (loanReturnDate.isEmpty) "" else DateFormatUtils.format(loanReturnDate.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
+        addField(doc, header(i), map.getOrElse("originalNameUsage", map.getOrElse("typifiedName", "")))
+        i += 1
         for (v2 <- map.getOrElse("duplicates", "").split('|'))
           if (StringUtils.isNotEmpty(v2)) addField(doc, header(i), v2)
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("recordNumber", ""))
-        i = i + 1
-        addField(doc,header(i), if (firstLoadDate.isEmpty) "" else DateFormatUtils.format(firstLoadDate.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("nameMatchMetric.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("phenology", ""))
-        i = i + 1 //TODO make this a controlled vocab that gets mapped during processing...
+        i += 1
+        addField(doc, header(i), map.getOrElse("recordNumber", ""))
+        i += 1
+        addField(doc, header(i), if (firstLoadDate.isEmpty) "" else DateFormatUtils.format(firstLoadDate.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
+        addField(doc, header(i), map.getOrElse("nameMatchMetric.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("phenology", ""))
+        i += 1 //TODO make this a controlled vocab that gets mapped during processing...
         if (outlierForLayers != null)
           for (j <- outlierForLayers)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
-        addField(doc,header(i), outlierForLayers.length.toString)
-        i = i + 1
+        i += 1
+        addField(doc, header(i), outlierForLayers.length.toString)
+        i += 1
         if (taxonIssueArray != null)
           for (j <- taxonIssueArray)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("identificationQualifier", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("identificationQualifier.p", ""))
-        i = i + 1
+        i += 1
+        addField(doc, header(i), map.getOrElse("identificationQualifier", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("identificationQualifier.p", ""))
+        i += 1
         if (habitats != null)
           for (j <- habitats)
             if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("identifiedBy", ""))
-        i = i + 1
-        addField(doc,header(i), if (dateIdentified.isEmpty) "" else DateFormatUtils.format(dateIdentified.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        i = i + 1
-        addField(doc,header(i), sensitiveMap.getOrElse("decimalLongitude", ""))
-        i = i + 1
-        addField(doc,header(i), sensitiveMap.getOrElse("decimalLatitude", ""))
-        i = i + 1
-        addField(doc,header(i), pest_tmp)
-        i = i + 1
+        i += 1
+        addField(doc, header(i), map.getOrElse("identifiedBy", ""))
+        i += 1
+        addField(doc, header(i), if (dateIdentified.isEmpty) "" else DateFormatUtils.format(dateIdentified.get, "yyyy-MM-dd'T'HH:mm:ss'Z'"))
+        i += 1
+        addField(doc, header(i), sensitiveMap.getOrElse("decimalLongitude", ""))
+        i += 1
+        addField(doc, header(i), sensitiveMap.getOrElse("decimalLatitude", ""))
+        i += 1
+        addField(doc, header(i), pest_tmp)
+        i += 1
         for (v1 <- map.getOrElse("recordedBy.p", "").split('|'))
-          if (StringUtils.isNotEmpty(v1)) addField(doc,header(i), v1)
-        i = i + 1
+          if (StringUtils.isNotEmpty(v1)) addField(doc, header(i), v1)
+        i += 1
         addField(doc,header(i), map.getOrElse("duplicationStatus.p", ""))
-        i = i + 1
+        i += 1
         for (v1 <- map.getOrElse("associatedOccurrences.p", "").split('|'))
-          if (StringUtils.isNotEmpty(v1)) addField(doc,header(i), v1)
-        i = i + 1
+          if (StringUtils.isNotEmpty(v1)) addField(doc, header(i), v1)
+        i += 1
         if (dupTypes != null)
           for (j <- dupTypes)
-            if (StringUtils.isNotEmpty(j)) addField(doc,header(i), j)
-        i = i + 1
-        addField(doc,header(i), sensitiveMap.getOrElse("coordinateUncertaintyInMeters.p", ""))
-        i = i + 1
-        addField(doc,header(i), distanceOutsideExpertRange)
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("verbatimElevation.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("minimumElevationInMeters.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("maximumElevationInMeters.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("verbatimDepth.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("minimumDepthInMeters.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("maximumDepthInMeters.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("nameParseType.p", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("occurrenceStatus.p", "present"))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("occurrenceDetails", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("photographer", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("rights", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("georeferenceVerificationStatus", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("occurrenceStatus", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("locality", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("decimalLatitude", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("decimalLongitude", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("geodeticDatum", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("sex", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("lifeStage", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("behavior", ""))
-        i = i + 1
-        addField(doc,header(i), sensitiveMap.getOrElse("locality", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("eventID", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("locationID", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("datasetName", ""))
-        i = i + 1
-        addField(doc,header(i), map.getOrElse("reproductiveCondition", ""))
-        i = i + 1
+            if (StringUtils.isNotEmpty(j)) addField(doc, header(i), j)
+        i += 1
+        addField(doc, header(i), sensitiveMap.getOrElse("coordinateUncertaintyInMeters.p", ""))
+        i += 1
+        addField(doc, header(i), distanceOutsideExpertRange)
+        i += 1
+        addField(doc, header(i), map.getOrElse("verbatimElevation.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("minimumElevationInMeters.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("maximumElevationInMeters.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("verbatimDepth.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("minimumDepthInMeters.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("maximumDepthInMeters.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("nameParseType.p", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("occurrenceStatus.p", "present"))
+        i += 1
+        addField(doc, header(i), map.getOrElse("occurrenceDetails", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("photographer", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("rights", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("georeferenceVerificationStatus", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("occurrenceStatus", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("locality", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("decimalLatitude", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("decimalLongitude", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("geodeticDatum", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("sex", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("lifeStage", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("behavior", ""))
+        i += 1
+        addField(doc, header(i), sensitiveMap.getOrElse("locality", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("eventID", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("locationID", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("datasetName", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("reproductiveCondition", ""))
+        i += 1
 
         Config.additionalFieldsToIndex.foreach(field => {
           addField(doc,header(i), map.getOrElse(field, ""))
-          i = i + 1
+          i += 1
         })
       }
     } catch {
