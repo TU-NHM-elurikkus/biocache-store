@@ -755,6 +755,7 @@
     <copyField source="lat_long" dest="quad" />
     <copyField source="lat_long" dest="geohash" />
     <!-- BIE additions -->
+    <copyField source="dataset_name" dest="text"/>
     <copyField source="data_provider" dest="text" />
     <copyField source="data_resource" dest="text" />
     <copyField source="institution_code" dest="text" />
