@@ -7,8 +7,8 @@ import scala.collection.mutable
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.solr.core.{CoreContainer}
 import org.apache.solr.client.solrj.{SolrQuery, SolrServer, StreamingResponseCallback}
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer
@@ -19,8 +19,8 @@ import org.apache.solr.common.params.{MapSolrParams, ModifiableSolrParams}
 import org.slf4j.LoggerFactory
 
 import au.org.ala.biocache.Config
-import au.org.ala.biocache.dao.OccurrenceDAO
 import au.org.ala.biocache.caches.TaxonSpeciesListDAO
+import au.org.ala.biocache.dao.OccurrenceDAO
 import au.org.ala.biocache.index.lucene.{DocBuilder, LuceneIndexing}
 import au.org.ala.biocache.load.FullRecordMapper
 import au.org.ala.biocache.parser.DateParser
