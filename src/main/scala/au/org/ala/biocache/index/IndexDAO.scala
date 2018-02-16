@@ -1,23 +1,22 @@
 package au.org.ala.biocache.index
 
-import org.apache.commons.lang.time.DateUtils
+import java.io.{File, FileWriter, OutputStream}
+import java.util.Date
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.util.parsing.json.JSON
+
+import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang.time.{DateFormatUtils, DateUtils}
 import org.slf4j.LoggerFactory
 
-import scala.collection.mutable.ArrayBuffer
-import java.util.Date
-
-import org.apache.commons.lang.time.DateFormatUtils
-import java.io.{File, FileWriter, OutputStream}
-
-import scala.util.parsing.json.JSON
-import au.org.ala.biocache.dao.OccurrenceDAO
-import au.org.ala.biocache.parser.DateParser
 import au.org.ala.biocache.Config
+import au.org.ala.biocache.caches.{TaxonProfileDAO, TaxonSpeciesListDAO}
+import au.org.ala.biocache.dao.OccurrenceDAO
 import au.org.ala.biocache.index.lucene.DocBuilder
 import au.org.ala.biocache.load.FullRecordMapper
-import au.org.ala.biocache.vocab.AssertionStatus
+import au.org.ala.biocache.parser.DateParser
 import au.org.ala.biocache.util.Json
-import org.apache.commons.lang.StringUtils
+import au.org.ala.biocache.vocab.AssertionStatus
 
 /**
  * All Index implementations need to extend this trait.
@@ -158,7 +157,7 @@ trait IndexDAO {
       "occurrence_details", "photographer_s", "rights", "raw_geo_validation_status_s", "raw_occurrence_status_s",
       "raw_locality", "raw_latitude", "raw_longitude", "raw_datum", "raw_sex", "life_stage", "behavior",
       "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s", "license",
-      "rightsholder"
+      "rightsholder", "species_list_uid"
   ) ::: Config.additionalFieldsToIndex
 
   /**
@@ -424,6 +423,13 @@ trait IndexDAO {
           case e: Exception => distanceOutsideExpertRange = ""
         }
 
+        val taxonGuid = getValue("taxonID", map)
+        val speciesLists = TaxonSpeciesListDAO.getCachedListsForTaxon(taxonGuid)
+        val listGuids = ArrayBuffer.empty[String]
+        speciesLists.foreach { v =>
+          listGuids += v
+        }
+
         // the returned list needs to match up with the CSV header
         return List(
           getValue("uuid", map),
@@ -574,7 +580,8 @@ trait IndexDAO {
           map.getOrElse("datasetName", ""),
           map.getOrElse("reproductiveCondition", ""),
           map.getOrElse("license.p", ""),
-          map.getOrElse("rightsholder", "")
+          map.getOrElse("rightsholder", ""),
+          listGuids.mkString("|")
         ) ::: Config.additionalFieldsToIndex.map(field => map.getOrElse(field, ""))
       } else {
         return List()
@@ -1131,6 +1138,8 @@ trait IndexDAO {
         addField(doc, header(i), map.getOrElse("datasetName", ""))
         i += 1
         addField(doc, header(i), map.getOrElse("reproductiveCondition", ""))
+        i += 1
+        addField(doc, "species_list_uid", "")
         i += 1
 
         Config.additionalFieldsToIndex.foreach(field => {
