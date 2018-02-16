@@ -1,40 +1,39 @@
 package au.org.ala.biocache.index
 
+import java.io.{File, FileWriter, OutputStream}
+import java.util.Date
+import java.util.concurrent.ArrayBlockingQueue
+import scala.collection.mutable
+
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import org.slf4j.LoggerFactory
+import org.apache.commons.lang3.StringEscapeUtils
+import org.apache.commons.lang.StringUtils
 import org.apache.solr.core.{CoreContainer}
 import org.apache.solr.client.solrj.{SolrQuery, SolrServer, StreamingResponseCallback}
-import au.org.ala.biocache.dao.OccurrenceDAO
-import org.apache.solr.common.{SolrDocument, SolrInputDocument}
-import java.io.{File, FileWriter, OutputStream}
-
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer
 import org.apache.solr.client.solrj.response.FacetField
+import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 import org.apache.solr.common.params.{MapSolrParams, ModifiableSolrParams}
-import java.util.Date
+import org.slf4j.LoggerFactory
 
-import au.org.ala.biocache.parser.DateParser
 import au.org.ala.biocache.Config
+import au.org.ala.biocache.dao.OccurrenceDAO
 import au.org.ala.biocache.caches.TaxonSpeciesListDAO
-import org.apache.commons.lang.StringUtils
-import java.util.concurrent.ArrayBlockingQueue
-
 import au.org.ala.biocache.index.lucene.{DocBuilder, LuceneIndexing}
 import au.org.ala.biocache.load.FullRecordMapper
-import au.org.ala.biocache.vocab.{AssertionCodes, ErrorCode, ErrorCodeCategory, SpeciesGroups}
+import au.org.ala.biocache.parser.DateParser
 import au.org.ala.biocache.util.{GridUtil, Json}
-import org.apache.commons.lang3.StringEscapeUtils
-
-import scala.collection.mutable
+import au.org.ala.biocache.vocab.{AssertionCodes, ErrorCode, ErrorCodeCategory, SpeciesGroups}
 
 /**
   * DAO for indexing to SOLR
   */
-class SolrIndexDAO @Inject()(@Named("solr.home") solrHome: String,
-                             @Named("exclude.sensitive.values") excludeSensitiveValuesFor: String,
-                             @Named("extra.misc.fields") defaultMiscFields: String) extends IndexDAO {
+class SolrIndexDAO @Inject()(
+  @Named("solr.home") solrHome: String,
+  @Named("exclude.sensitive.values") excludeSensitiveValuesFor: String,
+  @Named("extra.misc.fields") defaultMiscFields: String) extends IndexDAO {
 
   import scala.collection.JavaConverters._
   import scala.collection.JavaConversions._
@@ -346,12 +345,13 @@ class SolrIndexDAO @Inject()(@Named("solr.home") solrHome: String,
     true
   }
 
-  val multifields = Array("duplicate_inst", "establishment_means", "species_group", "assertions", "data_hub_uid", "interactions", "outlier_layer",
-    "species_habitats", "multimedia", "all_image_url", "collectors", "duplicate_record", "duplicate_type","taxonomic_issue")
+  val multifields = Array("duplicate_inst", "establishment_means", "species_group", "assertions", "data_hub_uid",
+    "interactions", "outlier_layer", "species_habitats", "multimedia", "all_image_url", "collectors",
+    "duplicate_record", "duplicate_type", "taxonomic_issue", "species_list_uid")
 
   val typeNotSuitableForModelling = Array("invalid", "historic", "vagrant", "irruptive")
 
-  def extractPassAndFailed(json:String):(List[Int], List[(String,String)])={
+  def extractPassAndFailed(json:String):(List[Int], List[(String,String)]) = {
     val codes = codeRegex.findAllMatchIn(json).map(_.group(1).toInt).toList
     val names = nameRegex.findAllMatchIn(json).map(_.group(1)).toList
     val qaStatuses = qaStatusRegex.findAllMatchIn(json).map(_.group(1)).toList

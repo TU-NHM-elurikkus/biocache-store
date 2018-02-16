@@ -1139,7 +1139,7 @@ trait IndexDAO {
         i += 1
         addField(doc, header(i), map.getOrElse("reproductiveCondition", ""))
         i += 1
-        addField(doc, "species_list_uid", "")
+        addField(doc, header(i), map.getOrElse("species_list_uid", ""))
         i += 1
 
         Config.additionalFieldsToIndex.foreach(field => {
