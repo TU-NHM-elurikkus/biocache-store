@@ -140,7 +140,7 @@ occurrence_details	string	occurrenceDetails	F	F		F
 photographer_s	string	photographer	F	F		F
 record_type	string	basisOfRecord.p	F	F		F
 rights	string	rights	F	F		F
-alau_user_id	string	userId	F	F		F
+ala_user_id	string	userId	F	F		F
 all_image_url	string	images.p	T	T		F
 # assertions_missing - assertions missing
 # assertions_passed - assertions passed
