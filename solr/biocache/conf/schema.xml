@@ -568,8 +568,6 @@
         <!-- Not actually being used in the search -->
         <!-- field name="geo_regions" type="text_ws" indexed="true" stored="true" multiValued="true" omitNorms="false" / -->
         <field name="state" type="string" indexed="true" stored="true" multiValued="false" />
-        <field name="imcra" type="string" indexed="true" stored="true" multiValued="false" />
-        <field name="ibra" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="places" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="latitude" type="double" indexed="true" stored="true" multiValued="false" />
         <field name="sensitive_latitude" type="double" indexed="false" stored="true" multiValued="false" />
@@ -635,27 +633,19 @@
         <field name="raw_datum" type="string" indexed="false" stored="true" multiValued="true" />
         <field name="raw_latitude" type="string" indexed="false" stored="true" multiValued="true" />
         <field name="raw_longitude" type="string" indexed="false" stored="true" multiValued="true" />
-        <field name="raw_sex" type="string" indexed="true" stored="true" multiValued="true" />
-        <field name="life_stage" type="string" indexed="true" stored="true" multiValued="true" />
-        <field name="behavior" type="string" indexed="true" stored="true" multiValued="true" />
+        <field name="raw_sex" type="string" indexed="true" stored="true" multiValued="false" />
+        <field name="life_stage" type="string" indexed="true" stored="true" multiValued="false" />
+        <field name="behavior" type="string" indexed="true" stored="true" multiValued="false" />
 
         <!-- Not displayed in search results -->
-        <!-- field name="created_date" type="tdate" indexed="false" stored="true" multiValued="false" omitNorms="false" />
-        <field name="modified_date" type="tdate" indexed="false" stored="true" multiValued="false" omitNorms="false" / -->
         <!-- This is for Citzen Science records only -->
-        <field name="user_id" type="string_lowercase" indexed="true" stored="true" multiValued="false" omitNorms="false" />
-        <field name="alau_user_id" type="string_lowercase" indexed="true" stored="true" multiValued="false" omitNorms="false" />
         <field name="assertion_user_id" type="string_lowercase" indexed="true" stored="false" multiValued="true" omitNorms="false" />
-        <!-- Not displayed in search results -->
-        <!--field name="generalised_metres" type="int" indexed="false" stored="true" multiValued="false" omitNorms="false" / >
-        <field name="geodetic_datum" type="string" indexed="false" stored="true" multiValued="false" omitNorms="false" /> -->
         <!-- used for remarks searching -->
         <field name="location_remarks" type="string" indexed="false" stored="false" multiValued="false" />
         <field name="occurrence_remarks" type="string" indexed="false" stored="false" multiValued="false" />
         <field name="citation" type="string" indexed="false" stored="true" multiValued="false" />
 
         <!-- I don't think that we need this field - we can always add it later. -->
-        <!--field name="confidence" type="int" indexed="true" stored="true" multiValued="false" omitNorms="false" /-->
         <field name="systemAssertions" type="string" indexed="true" stored="true" multiValued="true" omitNorms="false" />
 
         <field name="last_assertion_date" type="tdate" indexed="true" stored="false" multiValued="false" />
@@ -674,7 +664,6 @@
         <field name="rem_text" type="text" indexed="true" stored="false" multiValued="true" />
         <field name="record_type" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="lsid" type="string" indexed="true" stored="false" multiValued="false" />
-        <field name="biogeographic_region" type="string" indexed="true" stored="true" multiValued="true" />
         <field name="raw_name" type="textgen" indexed="true" stored="false" multiValued="true" omitNorms="true" />
         <field name="matched_name" type="textgen" indexed="true" stored="false" multiValued="true" omitNorms="true" />
         <field name="collector_text" type="textgen" indexed="true" stored="true" multiValued="true" omitNorms="true" />
@@ -706,7 +695,6 @@
         <!-- SOLR 4.0 Spatial Fields -->
         <field name="quad" type="quad" indexed="true" stored="true" multiValued="false" />
         <field name="geohash" type="geohash" indexed="true" stored="true" multiValued="false" />
-
 
 
         <!-- Some ALA dynamic fields -->
@@ -781,8 +769,6 @@
     <copyField source="original_name_usage" dest="text" />
     <copyField source="collector" dest="collector_text" />
     <copyField source="identified_by" dest="identified_by_text" />
-    <copyField source="*_d" dest="*_d_rng" />
-    <copyField source="*_i" dest="*_i_rng" />
 
     <!-- This copy field is not in use anywhere -->
     <!--copyField source="taxon_name" dest="taxon_name_text"/-->
@@ -793,22 +779,17 @@
     <copyField source="type_status" dest="text" />
     <copyField source="raw_type_status" dest="text" />
     <copyField source="collector" dest="text" />
-    <copyField source="user_id" dest="text" />
 
+    <copyField source="*_d" dest="*_d_rng" />
+    <copyField source="*_i" dest="*_i_rng" />
     <copyField source="*conservation" dest="text" />
-
-    <copyField source="imcra" dest="biogeographic_region" />
-    <copyField source="ibra" dest="biogeographic_region" />
 
     <copyField source="country" dest="text" />
     <copyField source="state" dest="text" />
-    <copyField source="imcra" dest="text" />
-    <copyField source="ibra" dest="text" />
+    <copyField source="county" dest="text" />
+    <copyField source="municipality" dest="text" />
+    <copyField source="locality" dest="text" />
     <copyField source="places" dest="text" />
-    <!-- Not being used in the search -->
-    <!-- copyField source="state" dest="geo_regions" />
-    <copyField source="biogeographic_region" dest="geo_regions" />
-    <copyField source="places" dest="geo_regions"/ -->
 
     <copyField source="basis_of_record" dest="text" />
     <copyField source="basis_of_record" dest="record_type" />
@@ -820,30 +801,5 @@
     <copyField source="location_remarks" dest="rem_text" />
     <copyField source="occurrence_remarks" dest="rem_text" />
     <copyField source="citation" dest="rem_text" />
-
-    <!-- Above, multiple source fields are copied to the [text] field.
-        Another way to map multiple source fields to the same
-        destination field is to use the dynamic field syntax.
-        copyField also supports a maxChars to copy setting. -->
-
-    <!-- <copyField source="*_t" dest="text" maxChars="3000" /> -->
-
-    <!-- copy name to alphaNameSort, a field designed for sorting by name -->
-    <!-- <copyField source="name" dest="alphaNameSort" /> -->
-
-
-    <!-- Similarity is the scoring routine for each document vs. a query.
-        A custom similarity may be specified here, but the default is fine
-        for most applications. -->
-    <!-- <similarity class="org.apache.lucene.search.DefaultSimilarity" /> -->
-    <!-- ... OR ...
-        Specify a SimilarityFactory class name implementation
-        allowing parameters to be used.
-    -->
-    <!--
-    <similarity class="com.example.solr.CustomSimilarityFactory">
-        <str name="paramkey">param value</str>
-    </similarity>
-    -->
 
 </schema>
