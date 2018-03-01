@@ -1166,13 +1166,15 @@ trait IndexDAO {
  *
  * Not in use yet.
  */
-case class IndexField(fieldName: String, dataType: String, sourceField: String, multi: Boolean = false, storeAsArray: Boolean = false, extraField: Option[String] = None, isMiscProperty: Boolean = false) {
+case class IndexField(fieldName: String, dataType: String, sourceField: String, multi: Boolean = false,
+                      storeAsArray: Boolean = false, extraField: Option[String] = None,
+                      isMiscProperty: Boolean = false) {
 
   def getValuesForIndex(map: Map[String, String]): (String, Option[Array[String]]) = {
 
-    //get the source value. Cater for the situation where we get the parsed value if raw doesn't exist
+    // get the source value. Cater for the situation where we get the parsed value if raw doesn't exist
     val sourceValue: String = if (sourceField.contains(",")) {
-      //There are multiple fields that supply the source for the field
+      // There are multiple fields that supply the source for the field
       val fields = sourceField.split(",")
       fields.foldLeft("")((concat, value) => concat + "|" + map.getOrElse(value, ""))
     } else {
@@ -1237,7 +1239,8 @@ object IndexFields {
           values(2),
           "T" == values(3),
           "T" == values(4),
-          if (values(5).size > 0) Some(values(5)) else None, "T" == values(6)
+          if (values(5).size > 0) Some(values(5)) else None,
+          "T" == values(6)
         )
       }
     }

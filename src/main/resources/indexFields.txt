@@ -153,6 +153,7 @@ distance_outside_expert_range	double	distanceOutsideExpertRange.p	F	F		F
 # species_subgroup - list of species subgroups between left.p and right.p
 # suitable_modelling - true when not-suitable for modelling assertions are not set
 reproductive_condition_s	string	reproductiveCondition	T	T		F
+# don't duplicate fields here which are defined above
 	string	abcdIdentificationQualifier	F	F	F	F
 	string	abcdIdentificationQualifierInsertionPoint	F	F	F	F
 	string	abcdTypeStatus	F	F	F	F
@@ -168,7 +169,6 @@ reproductive_condition_s	string	reproductiveCondition	T	T		F
 	string	austConservation.p	F	F	F	F
 	string	australianHerbariumRegion	F	F	F	F
 	string	bed	F	F	F	F
-	string	behavior	F	F	F	F
 	string	bibliographicCitation	F	F	F	F
 	string	bor.qa	T	T	F	F
 	string	citation	F	F	F	F
@@ -241,7 +241,7 @@ reproductive_condition_s	string	reproductiveCondition	T	T		F
 	string	georeferenceVerificationStatus	F	F	F	F
 	string	georeferenceVerificationStatus.p	F	F	F	F
 	string	geospatialIssue	F	F	F	F
-geospatial_kosher	string	geospatiallyKosher	F	F	F	F
+	geospatial_kosher	string	geospatiallyKosher	F	F	F	F
 	string	group	F	F	F	F
 	string	habitat	F	F	F	F
 	string	habitat.p	F	F	F	F
@@ -283,7 +283,6 @@ geospatial_kosher	string	geospatiallyKosher	F	F	F	F
 	string	latestPeriodOrHighestSystem	F	F	F	F
 	string	latestEonOrHighestEonothem	F	F	F	F
 	string	license	F	F	F	F
-	string	lifeStage	F	F	F	F
 	string	lithostratigraphicTerms	F	F	F	F
 	string	loc.qa	T	T	F	F
 	string	locality.p	F	F	F	F
