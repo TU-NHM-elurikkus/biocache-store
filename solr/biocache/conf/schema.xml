@@ -637,6 +637,12 @@
         <field name="life_stage" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="behavior" type="string" indexed="true" stored="true" multiValued="false" />
 
+        <!-- Json format as string. It can contain pretty much anything -->
+        <field name="dynamic_properties" type="string" indexed="false" stored="true" multiValued="false" />
+
+        <!-- This is taken from the dynamicProperties field and only for bird observations -->
+        <field name="breeding" type="string" indexed="true" stored="true" multiValued="false" />
+
         <!-- Not displayed in search results -->
         <!-- This is for Citzen Science records only -->
         <field name="assertion_user_id" type="string_lowercase" indexed="true" stored="false" multiValued="true" omitNorms="false" />
