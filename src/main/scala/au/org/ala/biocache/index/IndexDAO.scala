@@ -157,7 +157,7 @@ trait IndexDAO {
       "occurrence_details", "photographer_s", "rights", "raw_geo_validation_status_s", "raw_occurrence_status_s",
       "raw_locality", "raw_latitude", "raw_longitude", "raw_datum", "raw_sex", "life_stage", "behavior",
       "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s", "license",
-      "rightsholder", "species_list_uid"
+      "rightsholder", "species_list_uid", "breeding", "dynamic_properties"
   ) ::: Config.additionalFieldsToIndex
 
   /**
@@ -430,6 +430,13 @@ trait IndexDAO {
           listGuids += v
         }
 
+        val breeding = {
+          val dynamics = map.getOrElse("dynamicProperties", "{}")
+          val jsonMap = JSON.parseFull(dynamics).get.asInstanceOf[Map[String, String]]
+          jsonMap.getOrElse("breeding", "")
+        }
+
+
         // the returned list needs to match up with the CSV header
         return List(
           getValue("uuid", map),
@@ -581,7 +588,9 @@ trait IndexDAO {
           map.getOrElse("reproductiveCondition", ""),
           map.getOrElse("license.p", ""),
           map.getOrElse("rightsholder", ""),
-          listGuids.mkString("|")
+          listGuids.mkString("|"),
+          breeding,
+          map.getOrElse("dynamicProperties", "{}")
         ) ::: Config.additionalFieldsToIndex.map(field => map.getOrElse(field, ""))
       } else {
         return List()
