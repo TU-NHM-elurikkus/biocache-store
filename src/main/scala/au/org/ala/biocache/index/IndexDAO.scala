@@ -1,8 +1,10 @@
 package au.org.ala.biocache.index
 
 import java.io.{File, FileWriter, OutputStream}
+import java.text.SimpleDateFormat
 import java.util.Date
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+
+import scala.collection.mutable.ArrayBuffer
 import scala.util.parsing.json.JSON
 
 import org.apache.commons.lang.StringUtils
@@ -10,7 +12,7 @@ import org.apache.commons.lang.time.{DateFormatUtils, DateUtils}
 import org.slf4j.LoggerFactory
 
 import au.org.ala.biocache.Config
-import au.org.ala.biocache.caches.{TaxonProfileDAO, TaxonSpeciesListDAO}
+import au.org.ala.biocache.caches.TaxonSpeciesListDAO
 import au.org.ala.biocache.dao.OccurrenceDAO
 import au.org.ala.biocache.index.lucene.DocBuilder
 import au.org.ala.biocache.load.FullRecordMapper
@@ -258,22 +260,35 @@ trait IndexDAO {
           Json.toStringArray(shab)
         }
 
-        var eventDate = getValue("eventDate", map)
-        var eventDateEnd = getValue("eventDateEnd.p", map)
         var occurrenceYear = getValue("year.p", map)
         var occurrenceDecade = ""
         if (occurrenceYear.length == 4) {
           occurrenceYear += "-01-01T00:00:00Z"
           occurrenceDecade = occurrenceYear.substring(0,3) + "0"
-        } else
+        } else {
           occurrenceYear = ""
-        //only want to include eventDates that are in the correct format
+        }
+
+        // Make sure eventDate is in allowed format
+        var eventDate = getValue("eventDate", map)
+        val datePatterns =  Array(
+          "yyyy-MM-dd'T'HH:mm:ss'Z'",
+          "yyyy-MM-dd HH:mm:ss",
+          "yyyy-MM-dd",
+          "yyyy-MM",
+          "yyyy"
+        )
         try {
-          DateUtils.parseDate(eventDate, Array("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+          val parsedDate = DateUtils.parseDate(eventDate, datePatterns)
+          val dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+          // Always index the full dateTime object even for ambiguous dates
+          eventDate = dateFormatter.format(parsedDate)
         } catch {
           case e: Exception => eventDate = ""
         }
+
         //only want to include eventDateEnds that are in the correct format
+        var eventDateEnd = getValue("eventDateEnd.p", map)
         try {
           DateUtils.parseDate(eventDateEnd, Array("yyyy-MM-dd"))
         } catch {
