@@ -258,7 +258,7 @@ trait IndexDAO {
           Json.toStringArray(shab)
         }
 
-        var eventDate = getValue("eventDate.p", map)
+        var eventDate = getValue("eventDate", map)
         var eventDateEnd = getValue("eventDateEnd.p", map)
         var occurrenceYear = getValue("year.p", map)
         var occurrenceDecade = ""
@@ -269,7 +269,7 @@ trait IndexDAO {
           occurrenceYear = ""
         //only want to include eventDates that are in the correct format
         try {
-          DateUtils.parseDate(eventDate, Array("yyyy-MM-dd"))
+          DateUtils.parseDate(eventDate, Array("yyyy-MM-dd'T'HH:mm:ss'Z'"))
         } catch {
           case e: Exception => eventDate = ""
         }
@@ -461,7 +461,7 @@ trait IndexDAO {
           getValue("collectionName.p", map),
           getValue("catalogNumber", map),
           taxonConceptId,
-          if (eventDate != "") eventDate + "T00:00:00Z" else "",
+          eventDate,
           if (eventDateEnd != "") eventDateEnd + "T00:00:00Z" else "",
           occurrenceYear,
           occurrenceDecade,
