@@ -80,7 +80,7 @@ object CollectorNameParser {
           })
         } else {
           val res = parse(stringValue)
-          if (res.isDefined){
+          if (res.isDefined) {
             return Some(List(res.get))
           } else {
             //check to see if it contains a comma delimited list - this needs to be done outside the other items due to mixed meaning of comma
@@ -104,7 +104,6 @@ object CollectorNameParser {
         //}
       }
     }
-
   }
 
   def parse(stringValue: String): Option[String] = {
@@ -116,7 +115,7 @@ object CollectorNameParser {
       case SurnamePuncFirstnamePattern(prefix, surname, initials, prefix2, firstname, middlename, initials2, prefix3) => logger.debug(stringValue + " SURNAME PUNCT PATTERN"); Some(generateName(firstname, surname, if (StringUtils.isEmpty(initials)) initials2 else initials, middlename, if (StringUtils.isNotEmpty(prefix3)) prefix3 else if (StringUtils.isNotEmpty(prefix2)) prefix2 else prefix))
       case FirstnameSurnamePattern(firstname, initials, surname) => logger.debug(stringValue + " FIRSTNAME SURNAME PATTERN"); Some(generateName(firstname, surname, initials))
       case SINGLE_NAME_PATTERN(surname) => logger.debug(stringValue + " SINGLENAME PATTERN"); Some(generateName(null, surname, null))
-      case _ => None
+      case _ => Some(stringValue)
     }
   }
 
