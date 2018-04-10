@@ -271,8 +271,9 @@ trait IndexDAO {
 
         // Make sure eventDate is in allowed format
         var eventDate = getValue("eventDate", map)
-        val datePatterns =  Array(
+        val datePatterns = Array(
           "yyyy-MM-dd'T'HH:mm:ss'Z'",
+          "yyyy-MM-dd'T'HH:mm'Z'",
           "yyyy-MM-dd HH:mm:ss",
           "yyyy-MM-dd",
           "yyyy-MM",
@@ -633,9 +634,9 @@ trait IndexDAO {
 
   def writeOccIndexModelToDoc(doc: DocBuilder, guid: String, map: scala.collection.Map[String, String]) = {
     try {
-      //get the lat lon values so that we can determine all the point values
+      // get the lat lon values so that we can determine all the point values
       val deleted = map.getOrElse(FullRecordMapper.deletedColumn, "false")
-      //only add it to the index is it is not deleted & not a blank record
+      // only add it to the index is it is not deleted & not a blank record
       if (!deleted.equals("true") && map.size > 1) {
 
         var slat = getValue("decimalLatitude.p", map)
@@ -653,7 +654,7 @@ trait IndexDAO {
           else
             Array[String]()
         }
-        //determine the type of multimedia that is available.
+        // determine the type of multimedia that is available.
         val multimedia: Array[String] = {
           val i = map.getOrElse("images", "[]")
           val s = map.getOrElse("sounds", "[]")
@@ -850,7 +851,7 @@ trait IndexDAO {
         val infoWith = map.getOrElse("informationWithheld.p", "")
         val pest_tmp = if (infoWith.contains("\t")) infoWith.substring(0, infoWith.indexOf("\t")) else "" //startsWith("PEST")) "PEST" else ""
 
-        var distanceOutsideExpertRange = map.getOrElse("distanceOutsideExpertRange.p", "");
+        var distanceOutsideExpertRange = map.getOrElse("distanceOutsideExpertRange.p", "")
         //only want valid numbers
         try {
           distanceOutsideExpertRange.toDouble
@@ -1004,14 +1005,14 @@ trait IndexDAO {
         i += 1
         addField(doc, header(i), geoKosher)
         i += 1
-        //NC 2013-05-23: Assertions are now values, failed, passed and untested these will be handled separately
+        // NC 2013-05-23: Assertions are now values, failed, passed and untested these will be handled separately
         addField(doc, header(i), getValue("locationRemarks", map))
         i += 1
         addField(doc, header(i), getValue("occurrenceRemarks", map))
         i += 1
         addField(doc, header(i), hasUserAss)
         i += 1
-        //  userAssertionStatu
+        // userAssertionStatu
         addField(doc, header(i), getValue("recordedBy", map))
         i += 1
         addField(doc, header(i), stateCons)
