@@ -272,6 +272,7 @@ trait IndexDAO {
         // Make sure eventDate is in allowed format
         var eventDate = getValue("eventDate", map)
         val datePatterns = Array(
+          "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'",
           "yyyy-MM-dd'T'HH:mm:ss'Z'",
           "yyyy-MM-dd'T'HH:mm'Z'",
           "yyyy-MM-dd HH:mm:ss",
