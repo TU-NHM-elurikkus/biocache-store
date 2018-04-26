@@ -107,6 +107,7 @@ outlier_layer	string	outlierForLayers.p	T	T		F
 # outlier_layer_count - based on the count in outlier_layer	F
 taxonomic_issue	string	taxonomicIssue.p	F	F		F
 raw_identification_qualifier	string	identificationQualifier	F	F		F
+identification_qualifier	string	identificationQualifier	F	F		F
 species_habitats	string	speciesHabitats.p	T	T		F
 identified_by	string	identifiedBy	F	F		F
 identified_date	date	dateIdentified.p	F	F		F

@@ -13,5 +13,11 @@ presumably cultivated	presumably cultivated
 assumed to be native	assumed to be native
 none of the above	none of the above
 doubtfully native	doubtfully native
+in wild	in wild
+introduced	introduced
+naturalised	naturalised
+invasive	invasive
+under human management	under human management
+escaped from captivity	escaped from captivity
+uncertain	uncertain
 unknown	unknown
-

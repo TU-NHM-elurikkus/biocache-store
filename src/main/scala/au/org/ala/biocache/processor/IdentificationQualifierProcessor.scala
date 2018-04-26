@@ -23,10 +23,15 @@ class IdentificationQualifierProcessor extends Processor {
     val (certainKeywordList, unCertainKeywordList) = readFromFile ("/identificationQualifiers.txt")
 
     def process(guid: String, raw: FullRecord, processed: FullRecord, lastProcessed: Option[FullRecord] = None): Array[QualityAssertion] = {
-        val (translatedIdQualifier, assertions) = processIdentificationQualifier (raw.identification.identificationQualifier)
-        processed.identification.identificationQualifier = translatedIdQualifier
+        val (translatedIdQualifier, assertions) = processIdentificationQualifier(raw.identification.identificationQualifier)
 
-        val (translatedAbcdIdQualifier, abcdAssertions) = processIdentificationQualifier (raw.identification.abcdIdentificationQualifier)
+        if ((translatedIdQualifier != NotProvided) && (translatedIdQualifier != NotRecognised)) {
+            processed.identification.identificationQualifier = raw.identification.identificationQualifier.toLowerCase
+        } else {
+            processed.identification.identificationQualifier = translatedIdQualifier
+        }
+
+        val (translatedAbcdIdQualifier, abcdAssertions) = processIdentificationQualifier(raw.identification.abcdIdentificationQualifier)
         processed.identification.abcdIdentificationQualifier = translatedAbcdIdQualifier
 
         (assertions ++ abcdAssertions).toArray

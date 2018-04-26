@@ -601,7 +601,6 @@
         <field name="collectors" type="string" indexed="true" stored="true" multiValued="true" />
         <field name="rightsholder" type="string" indexed="true" stored="true" multiValued="false" />
 
-        <field name="establishment_means" type="string" indexed="true" stored="false" multiValued="true" />
         <field name="exchange_number" type="string" indexed="true" stored="false" multiValued="false" />
         <field name="duplicate_inst" type="textgen" indexed="true" stored="false" multiValued="true" />
         <field name="original_name_usage" type="string" indexed="true" stored="false" multiValued="false" />
@@ -636,6 +635,8 @@
         <field name="raw_sex" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="life_stage" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="behavior" type="string" indexed="true" stored="true" multiValued="false" />
+        <field name="establishment_means" type="string" indexed="true" stored="true" multiValued="false" />
+        <field name="identification_qualifier" type="string" indexed="true" stored="true" multiValued="false" />
 
         <!-- Json format as string. It can contain pretty much anything -->
         <field name="dynamic_properties" type="string" indexed="false" stored="true" multiValued="false" />
