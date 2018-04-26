@@ -4,6 +4,8 @@ confident
 confirm(ed)
 positive
 verified
+correct
+true
 
 [Uncertain]
 ?
@@ -28,3 +30,5 @@ not sure
 not confirm(ed)
 not correct
 unconfirm(ed)
+dubious
+false
