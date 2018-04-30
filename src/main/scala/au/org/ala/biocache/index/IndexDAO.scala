@@ -590,7 +590,7 @@ trait IndexDAO {
           map.getOrElse("minimumDepthInMeters.p", ""),
           map.getOrElse("maximumDepthInMeters.p", ""),
           map.getOrElse("nameParseType.p", ""),
-          map.getOrElse("occurrenceStatus.p", ""),
+          map.getOrElse("occurrenceStatus", ""),
           map.getOrElse("occurrenceDetails", ""),
           map.getOrElse("photographer", ""),
           map.getOrElse("rights", ""),
@@ -1134,7 +1134,7 @@ trait IndexDAO {
         i += 1
         addField(doc, header(i), map.getOrElse("nameParseType.p", ""))
         i += 1
-        addField(doc, header(i), map.getOrElse("occurrenceStatus.p", ""))
+        addField(doc, header(i), map.getOrElse("occurrenceStatus", ""))
         i += 1
         addField(doc, header(i), map.getOrElse("occurrenceDetails", ""))
         i += 1
