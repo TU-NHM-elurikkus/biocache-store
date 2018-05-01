@@ -159,7 +159,7 @@ trait IndexDAO {
       "occurrence_details", "photographer_s", "rights", "raw_geo_validation_status_s", "raw_occurrence_status_s",
       "raw_locality", "raw_latitude", "raw_longitude", "raw_datum", "raw_sex", "life_stage", "behavior",
       "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s", "license",
-      "rightsholder", "species_list_uid", "breeding", "dynamic_properties"
+      "rightsholder", "species_list_uid", "breeding", "dynamic_properties", "organism_quantity"
   ) ::: Config.additionalFieldsToIndex
 
   /**
@@ -613,6 +613,7 @@ trait IndexDAO {
           listGuids.mkString("|"),
           breeding,
           map.getOrElse("dynamicProperties", "{}")
+          map.getOrElse("organismQuantity", "")
         ) ::: Config.additionalFieldsToIndex.map(field => map.getOrElse(field, ""))
       } else {
         return List()

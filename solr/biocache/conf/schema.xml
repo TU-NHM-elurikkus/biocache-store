@@ -638,6 +638,7 @@
         <field name="establishment_means" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="identification_qualifier" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="occurrence_status" type="string" indexed="true" stored="true" multiValued="false" />
+        <field name="organism_quantity" type="string" indexed="true" stored="true" multiValued="false" />
 
         <!-- Json format as string. It can contain pretty much anything -->
         <field name="dynamic_properties" type="string" indexed="false" stored="true" multiValued="false" />
