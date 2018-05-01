@@ -612,7 +612,7 @@ trait IndexDAO {
           map.getOrElse("rightsholder", ""),
           listGuids.mkString("|"),
           breeding,
-          map.getOrElse("dynamicProperties", "{}")
+          map.getOrElse("dynamicProperties", "{}"),
           map.getOrElse("organismQuantity", "")
         ) ::: Config.additionalFieldsToIndex.map(field => map.getOrElse(field, ""))
       } else {
