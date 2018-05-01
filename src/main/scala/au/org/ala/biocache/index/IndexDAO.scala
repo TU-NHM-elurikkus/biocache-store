@@ -158,8 +158,8 @@ trait IndexDAO {
       "max_elevation_d", "depth_d", "min_depth_d", "max_depth_d", "name_parse_type_s", "occurrence_status",
       "occurrence_details", "photographer_s", "rights", "raw_geo_validation_status_s", "raw_occurrence_status_s",
       "raw_locality", "raw_latitude", "raw_longitude", "raw_datum", "raw_sex", "life_stage", "behavior",
-      "sensitive_locality", "event_id", "location_id", "dataset_name", "reproductive_condition_s", "license",
-      "rightsholder", "species_list_uid", "breeding", "dynamic_properties", "organism_quantity"
+      "sensitive_locality", "event_id", "location_id", "dataset_name", "organism_quantity", "reproductive_condition_s",
+      "license", "rightsholder", "species_list_uid", "breeding", "dynamic_properties"
   ) ::: Config.additionalFieldsToIndex
 
   /**
@@ -1168,6 +1168,8 @@ trait IndexDAO {
         addField(doc, header(i), map.getOrElse("locationID", ""))
         i += 1
         addField(doc, header(i), map.getOrElse("datasetName", ""))
+        i += 1
+        addField(doc, header(i), map.getOrElse("organismQuantity", ""))
         i += 1
         addField(doc, header(i), map.getOrElse("reproductiveCondition", ""))
         i += 1
