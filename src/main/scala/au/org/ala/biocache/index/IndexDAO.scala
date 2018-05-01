@@ -607,13 +607,13 @@ trait IndexDAO {
           map.getOrElse("eventID", ""),
           map.getOrElse("locationID", ""),
           map.getOrElse("datasetName", ""),
+          map.getOrElse("organismQuantity", "")
           map.getOrElse("reproductiveCondition", ""),
           map.getOrElse("license.p", ""),
           map.getOrElse("rightsholder", ""),
           listGuids.mkString("|"),
           breeding,
           map.getOrElse("dynamicProperties", "{}"),
-          map.getOrElse("organismQuantity", "")
         ) ::: Config.additionalFieldsToIndex.map(field => map.getOrElse(field, ""))
       } else {
         return List()
