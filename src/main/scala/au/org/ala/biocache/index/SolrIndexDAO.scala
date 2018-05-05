@@ -101,7 +101,8 @@ class SolrIndexDAO @Inject()(
             solrServer = new EmbeddedSolrServer(cc, "biocache")
           }
         } else {
-          logger.info("Initialising connection to SOLR server.....")
+          logger.info("Initialising connection to SOLR server...")
+          logger.info("BATCH_SIZE: " + BATCH_SIZE + " | HARD_COMMIT_SIZE: " + HARD_COMMIT_SIZE)
           solrServer = new ConcurrentUpdateSolrServer(solrHome, BATCH_SIZE, Config.solrUpdateThreads)
           logger.info("Initialising connection to SOLR server - done.")
         }
