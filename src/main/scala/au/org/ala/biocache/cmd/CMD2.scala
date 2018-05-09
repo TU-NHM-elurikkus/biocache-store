@@ -19,7 +19,7 @@ import scala.collection.JavaConversions
 trait Tool {
   def cmd : String
   def desc : String
-  def help  = cmd
+  def help = cmd
   def main(args:Array[String]) : Unit
 }
 
@@ -29,7 +29,7 @@ trait NoArgsTool extends Tool {
    * Checks for arguments. If supplied return help.
    * @param args
    */
-  def proceed(args:Array[String], proc:() => Unit){
+  def proceed(args:Array[String], proc:() => Unit) {
     if(!args.isEmpty){
       println("Usage: " + help)
       println("\tNo arguments required for tool")
@@ -143,11 +143,11 @@ object CMD2 {
   }
 
   def printTools = {
-    var idx=1
+    var idx = 1
     tools.foreach{ tool =>
-      println( "-" * 80)
-      padAndPrint("["+idx+"] " + tool.cmd + " - " + tool.desc )
-      idx = idx + 1
+      println("-" * 80)
+      padAndPrint("[" + idx + "] " + tool.cmd + " - " + tool.desc)
+      idx += 1
     }
   }
 

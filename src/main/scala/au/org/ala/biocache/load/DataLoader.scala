@@ -34,7 +34,7 @@ trait DataLoader {
   val loadTime = org.apache.commons.lang.time.DateFormatUtils.format(new java.util.Date, "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val sftpPattern = """sftp://([a-zA-z\.]*):([0-9a-zA-Z_/\.\-]*)""".r
 
-  def emptyTempFileStore(resourceUid:String) = {
+  def emptyTempFileStore(resourceUid: String) = {
     FileUtils.deleteQuietly(new File(temporaryFileStore + File.separator + resourceUid))
   }
 
@@ -43,7 +43,7 @@ trait DataLoader {
    * @param resourceUid
    * @return
    */
-  def getDeletedFileWriter(resourceUid:String):java.io.FileWriter ={
+  def getDeletedFileWriter(resourceUid: String):java.io.FileWriter ={
     val file =  new File(Config.deletedFileStore +File.separator + resourceUid+File.separator+"deleted.txt")
     FileUtils.forceMkdir(file.getParentFile)
     new java.io.FileWriter(file)
@@ -69,7 +69,7 @@ trait DataLoader {
    * Sampling, Processing and Indexing look for the row key file.
    * An empty file should be enough to prevent the phase from going ahead...
    */
-  def setNotLoadedForOtherPhases(resourceUid:String){
+  def setNotLoadedForOtherPhases(resourceUid: String){
     def writer = getRowKeyWriter(resourceUid, true)
     if(writer.isDefined){
       writer.get.flush
@@ -100,7 +100,7 @@ trait DataLoader {
    */
   def retrieveConnectionParameters(resourceUid: String) : Option[DataResourceConfig] = try {
 
-    //full document
+    // full document
     val map = getDataResourceDetailsAsMap(resourceUid)
 
     //connection details
@@ -118,14 +118,14 @@ trait DataLoader {
       }
     }
 
-    //retrieve the unique terms for this data resource
+    // retrieve the unique terms for this data resource
     val uniqueTerms = connectionParameters.get("termsForUniqueKey") match {
       case Some(list: List[String]) => list
       case Some(singleValue: String) => List(singleValue)
       case None => List[String]()
     }
 
-    //optional config params for custom services
+    // optional config params for custom services
     val customParams = protocol.asInstanceOf[String].toLowerCase match {
       // Only current data resource using this is dr710
       case "customwebservice" => {
@@ -135,11 +135,11 @@ trait DataLoader {
       case _ => Map[String, String]()
     }
 
-    //last checked date
+    // last checked date
     val lastChecked = map("lastChecked").asInstanceOf[String]
     val dateLastChecked = DateParser.parseStringToDate(lastChecked)
 
-    //return the config
+    // return the config
     Some(new DataResourceConfig(protocol,
       urls.asInstanceOf[List[String]],
       uniqueTerms,
@@ -178,19 +178,19 @@ trait DataLoader {
       uniqueId
   }
 
-  def load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], multimedia:Seq[Multimedia]) : Boolean = {
-    load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], true, false, false, None, multimedia, false)
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], multimedia: Seq[Multimedia]) : Boolean = {
+    load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], true, false, false, None, multimedia, false)
   }
 
-  def load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String]) : Boolean = {
-    load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], true, false, false, None, List(), false)
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String]) : Boolean = {
+    load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], true, false, false, None, List(), false)
   }
 
-  def load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], updateLastModified:Boolean) : Boolean = {
-    load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], updateLastModified, false, false, None, List(), false)
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean) : Boolean = {
+    load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified, false, false, None, List(), false)
   }
 
-  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean, downloadMedia: Boolean, deleteIfNullValue: Boolean):Boolean ={
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean, downloadMedia: Boolean, deleteIfNullValue: Boolean): Boolean ={
     load(dataResourceUid, fr, identifyingTerms, updateLastModified, downloadMedia, false, None, List(), deleteIfNullValue)
   }
 
@@ -206,7 +206,9 @@ trait DataLoader {
    * @param rowKeyWriter
    * @return
    */
-  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean, downloadMedia: Boolean, stripSpaces: Boolean, rowKeyWriter: Option[Writer], multimedia: Seq[Multimedia], deleteIfNullValue: Boolean): Boolean = {
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean,
+           downloadMedia: Boolean, stripSpaces: Boolean, rowKeyWriter: Option[Writer], multimedia: Seq[Multimedia],
+           deleteIfNullValue: Boolean): Boolean = {
 
     //the details of how to construct the UniqueID belong in the Collectory
     val uniqueID = if(identifyingTerms.isEmpty) {
@@ -227,38 +229,38 @@ trait DataLoader {
       }
     }
 
-    //add the full record
+    // add the full record
     fr.uuid = recordUuid
-    //The row key is the uniqueID for the record. This will always start with the dataResourceUid
+    // The row key is the uniqueID for the record. This will always start with the dataResourceUid
     fr.rowKey = if(uniqueID.isEmpty) {
       dataResourceUid + "|" + recordUuid
     } else {
       uniqueID.get
     }
 
-    //write the rowkey to file if a writer is provided. allows large data resources to be
-    //incrementally updated and only process/index changes
+    // write the rowkey to file if a writer is provided. allows large data resources to be
+    // incrementally updated and only process/index changes
     if(rowKeyWriter.isDefined){
-      rowKeyWriter.get.write(fr.rowKey+"\n")
+      rowKeyWriter.get.write(fr.rowKey + "\n")
     }
 
-    //The last load time
+    // The last load time
     if(updateLastModified){
       fr.lastModifiedTime = loadTime
     }
 
-    //set first loaded date indicating when this record was first loaded
-    if(isNew){
+    // set first loaded date indicating when this record was first loaded
+    if(isNew) {
       fr.firstLoaded = loadTime
     }
 
     fr.attribution.dataResourceUid = dataResourceUid
 
-    //process the media for this record
+    // process the media for this record
     processMedia(dataResourceUid, fr, multimedia)
 
-    //load the record
-    Config.occurrenceDAO.addRawOccurrence(fr,deleteIfNullValue)
+    // load the record
+    Config.occurrenceDAO.addRawOccurrence(fr, deleteIfNullValue)
     true
   }
 
@@ -300,8 +302,8 @@ trait DataLoader {
    */
   def processMedia(dataResourceUid: String, fr: FullRecord, multimedia: Seq[Multimedia] = Seq.empty[Multimedia]) : FullRecord = {
 
-    //download the media - checking if it exists already
-    //supplied media comes from a separate source. If it's also listed in the associatedMedia then don't double-load it
+    // download the media - checking if it exists already
+    // supplied media comes from a separate source. If it's also listed in the associatedMedia then don't double-load it
     val suppliedMedia = multimedia map { media => media.location.toString }
     val associatedMedia = DownloadMedia.unpackAssociatedMedia(fr.occurrence.associatedMedia).filter { url =>
       suppliedMedia.forall(!_.endsWith(url))
@@ -327,7 +329,7 @@ trait DataLoader {
         multiMediaObject match {
           case Some(multimedia) => Some(multimedia)
           case None => {
-            //construct metadata from record
+            // construct metadata from record
             Some(new Multimedia(new URL(fileToStore), "", Map(
               "creator" -> fr.occurrence.recordedBy,
               "title" -> fr.classification.scientificName,
