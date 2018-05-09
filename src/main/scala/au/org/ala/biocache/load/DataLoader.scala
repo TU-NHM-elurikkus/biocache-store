@@ -264,10 +264,11 @@ trait DataLoader {
     true
   }
 
-  def filterURLs(associatedMedia: Seq[String], suppliedMedia: Seq[String]) : Seq[String] = {
+  def filterURLs(associatedMedia: Seq[String], suppliedMedia: Seq[String]): Seq[String] = {
     val media = new ArrayBuffer[String]
 
     if (Config.deduplicatePlutofLinks) {
+      logger.info("Config.deduplicatePlutofLinks")
       val isPlutofImage = { url: String =>
         url.contains("plutof.ut.ee") && Config.mediaStore.isValidImageURL(url)
       }
@@ -278,11 +279,12 @@ trait DataLoader {
       media ++= otherAM
       media ++= otherSM
 
-      media ++= (if (plutofAM.length == plutofSM.length) {
-        plutofSM
-      } else {
-        plutofAM
-      })
+      // media ++= (if (plutofAM.length == plutofSM.length) {
+      //   plutofSM
+      // } else {
+      //   plutofAM
+      // })
+      media ++= plutofSM  // plutof associated media is in supplied media where it has also metadata
     } else {
       media ++= associatedMedia
       media ++= suppliedMedia
