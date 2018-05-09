@@ -361,26 +361,25 @@ class DwCALoader extends DataLoader {
    * @return
    */
   def loadMultimedia(star: StarRecord, rowType: Term, imageBase: URL): Seq[Multimedia] = {
-    logger.info(s"Loading Multimedia: $star | $rowType | $imageBase")
-
-    val has_extension = star.extension(rowType)
-    logger.info(s"star.hasExtension: $has_extension")
-
     if (!star.hasExtension(rowType)) {
       return List.empty
     }
 
     val records = star.extension(rowType).asScala
-    logger.info(s"records: $records")
     val multimedia = new ListBuffer[Multimedia]
     records.foreach { row =>
       val terms = row.terms.filter { term => Option(row.value(term)).isDefined}
       val metadata = terms.map { term => term -> row.value(term) }.toMap[Term, String]
+
+      logger.info(s"row: $row")
+      logger.info(s"terms: $terms | metadata: $metadata | imageBase: $imageBase")
+
       locateMultimedia(row, imageBase) match {
         case Some(location) =>
           multimedia.add(Multimedia.create(location, metadata))
+          logger.info(s"Found location: $location")
         case None =>
-          logger.info("No location found for multimedia typed row: " + row)
+          logger.info(s"No location found for multimedia typed row: $row")
       }
     }
     multimedia
