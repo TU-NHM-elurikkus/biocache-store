@@ -371,13 +371,9 @@ class DwCALoader extends DataLoader {
       val terms = row.terms.filter { term => Option(row.value(term)).isDefined}
       val metadata = terms.map { term => term -> row.value(term) }.toMap[Term, String]
 
-      logger.info(s"row: $row")
-      logger.info(s"terms: $terms | metadata: $metadata | imageBase: $imageBase")
-
       locateMultimedia(row, imageBase) match {
         case Some(location) =>
           multimedia.add(Multimedia.create(location, metadata))
-          logger.info(s"Found location: $location")
         case None =>
           logger.info(s"No location found for multimedia typed row: $row")
       }

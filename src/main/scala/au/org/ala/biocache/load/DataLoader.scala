@@ -309,7 +309,15 @@ trait DataLoader {
       suppliedMedia.forall(!_.endsWith(url))
     }
 
+
+    logger.info("----------")
+    logger.info(s"suppliedMedia: $suppliedMedia")
+    logger.info(s"associatedMedia: $associatedMedia")
+
     val filesToImport = filterURLs(associatedMedia, suppliedMedia)
+
+    logger.info(s"filesToImport: $filesToImport")
+    logger.info("----------")
 
     if (filesToImport.isEmpty) {
       return fr
