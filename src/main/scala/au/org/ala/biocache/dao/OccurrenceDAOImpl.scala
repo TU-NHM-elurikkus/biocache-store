@@ -521,8 +521,8 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     *
     * @param fr
     */
-  def downloadMedia(fr:FullRecord) : Boolean = {
-    if (fr.occurrence.associatedMedia != null){
+  def downloadMedia(fr: FullRecord) : Boolean = {
+    if (fr.occurrence.associatedMedia != null) {
       val filesToImport = DownloadMedia.unpackAssociatedMedia(fr.occurrence.associatedMedia)
       val associatedMediaBuffer = new ArrayBuffer[String]
       filesToImport.foreach(fileToStore =>

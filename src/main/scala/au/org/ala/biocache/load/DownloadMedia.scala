@@ -62,7 +62,7 @@ object DownloadMedia extends Tool {
     }
   }
 
-  def processUrls(raw:FullRecord, processed:FullRecord, urls: Array[String]) {
+  def processUrls(raw: FullRecord, processed: FullRecord, urls: Array[String]) {
     val imageUrls = urls.filter(Config.mediaStore.isValidImageURL(_))
     val mediaStorePaths = new ArrayBuffer[String]
     imageUrls.foreach(imageUrl => {

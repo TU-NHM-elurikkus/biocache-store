@@ -268,7 +268,6 @@ trait DataLoader {
     val media = new ArrayBuffer[String]
 
     if (Config.deduplicatePlutofLinks) {
-      logger.info("Config.deduplicatePlutofLinks")
       val isPlutofImage = { url: String =>
         url.contains("plutof.ut.ee") && Config.mediaStore.isValidImageURL(url)
       }
@@ -279,12 +278,9 @@ trait DataLoader {
       media ++= otherAM
       media ++= otherSM
 
-      // media ++= (if (plutofAM.length == plutofSM.length) {
-      //   plutofSM
-      // } else {
-      //   plutofAM
-      // })
-      media ++= plutofSM  // plutof associated media is in supplied media where it has also metadata
+      // add only supplied media (media extension data) where it has also metadata
+      // plutof associated media is duplicated there and is not needed
+      media ++= plutofSM
     } else {
       media ++= associatedMedia
       media ++= suppliedMedia
@@ -311,15 +307,7 @@ trait DataLoader {
       suppliedMedia.forall(!_.endsWith(url))
     }
 
-
-    logger.info("----------")
-    logger.info(s"suppliedMedia: $suppliedMedia")
-    logger.info(s"associatedMedia: $associatedMedia")
-
     val filesToImport = filterURLs(associatedMedia, suppliedMedia)
-
-    logger.info(s"filesToImport: $filesToImport")
-    logger.info("----------")
 
     if (filesToImport.isEmpty) {
       return fr
@@ -337,7 +325,8 @@ trait DataLoader {
       val media = {
         val multiMediaObject = multimedia.find { media => media.location.toString == fileToStore }
         multiMediaObject match {
-          case Some(multimedia) => Some(multimedia)
+          case Some(multimedia) =>
+            Some(multimedia)
           case None => {
             // construct metadata from record
             Some(new Multimedia(new URL(fileToStore), "", Map(
@@ -352,8 +341,13 @@ trait DataLoader {
         }
       }
 
+      logger.info(s"media: $media")
+
       // save() checks to see if the media has already been stored
       val savedTo = Config.mediaStore.save(fr.uuid, fr.attribution.dataResourceUid, fileToStore, media)
+
+      logger.info(s"savedTo: $savedTo")
+
       savedTo match {
         case Some((savedFilename, savedFilePathOrId)) => {
           if (Config.mediaStore.isValidSound(fileToStore)) {
