@@ -270,9 +270,9 @@ object RemoteMediaStore extends MediaStore {
 
     // if already stored, just update metadata
     if(stored){
-      logger.debug("Media file " + urlToMedia + " already stored at " + imageId)
+      logger.info("Media file " + urlToMedia + " already stored at " + imageId)
 
-      logger(s"media: $media")
+      logger.info(s"media: $media")
 
       if(media.isDefined) {
         logger.debug("Updating metadata for image " + imageId)
