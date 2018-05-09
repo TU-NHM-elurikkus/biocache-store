@@ -250,7 +250,7 @@ object RemoteMediaStore extends MediaStore {
   def save(uuid: String, resourceUID: String, urlToMedia: String, media: Option[Multimedia]): Option[(String, String)] = {
 
     // is the supplied URL an image service URL ?? If so extract imageID and return.....
-    if(urlToMedia.startsWith(Config.remoteMediaStoreUrl)){
+    if(urlToMedia.startsWith(Config.remoteMediaStoreUrl)) {
       logger.info("Remote media store URL recognised: " + urlToMedia)
       //  http://images.ala.org.au/image/proxyImageThumbnailLarge?imageId=119d85b5-76cb-4d1d-af30-e141706be8bf
       val uri = new URI(urlToMedia)
@@ -268,11 +268,11 @@ object RemoteMediaStore extends MediaStore {
     // already stored?
     val (stored, fileName, imageId) = alreadyStored(uuid, resourceUID, urlToMedia)
 
+    logger.info(s"media: $media | stored: $stored | fileName: $fileName")
+
     // if already stored, just update metadata
     if(stored){
       logger.info("Media file " + urlToMedia + " already stored at " + imageId)
-
-      logger.info(s"media: $media")
 
       if(media.isDefined) {
         logger.debug("Updating metadata for image " + imageId)
