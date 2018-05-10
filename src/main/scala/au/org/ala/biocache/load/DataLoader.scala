@@ -353,7 +353,7 @@ trait DataLoader {
           } else if (Config.mediaStore.isValidImage(fileToStore)) {
             imagesBuffer += savedFilePathOrId
           }
-          associatedMediaBuffer += media.get.metadata.mkString(";")
+          associatedMediaBuffer += media.get.metadata.map(_.productIterator.mkString(":")).mkString(";")
         }
         case None => logger.warn("Unable to save file: " + fileToStore)
       }
@@ -403,7 +403,7 @@ trait DataLoader {
       }
     } else {
       logger.info(s"Unable to extract a new file for $resourceUid at $url")
-      (null,null)
+      (null, null)
     }
   }
 
