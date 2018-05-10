@@ -341,12 +341,8 @@ trait DataLoader {
         }
       }
 
-      logger.info(s"media: $media")
-
       // save() checks to see if the media has already been stored
       val savedTo = Config.mediaStore.save(fr.uuid, fr.attribution.dataResourceUid, fileToStore, media)
-
-      logger.info(s"savedTo: $savedTo")
 
       savedTo match {
         case Some((savedFilename, savedFilePathOrId)) => {
@@ -357,13 +353,13 @@ trait DataLoader {
           } else if (Config.mediaStore.isValidImage(fileToStore)) {
             imagesBuffer += savedFilePathOrId
           }
-          associatedMediaBuffer += savedFilename
+          associatedMediaBuffer += media.mkString(";")
         }
         case None => logger.warn("Unable to save file: " + fileToStore)
       }
 
       //add the references
-      fr.occurrence.associatedMedia = associatedMediaBuffer.toArray.mkString(";")
+      fr.occurrence.associatedMedia = associatedMediaBuffer.toArray.mkString(" | ")
       fr.occurrence.images = imagesBuffer.toArray
       fr.occurrence.sounds = soundsBuffer.toArray
       fr.occurrence.videos = videosBuffer.toArray

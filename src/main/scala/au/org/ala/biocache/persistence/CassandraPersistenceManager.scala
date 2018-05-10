@@ -20,7 +20,7 @@ import scala.Some
   * Major change: The thrift API now works with ByteBuffer instead of byte[]
   */
 class CassandraPersistenceManager @Inject() (
-                                              @Named("cassandra.hosts") val host:String = "localhost",
+                                              @Named("cassandra.hosts") val host: String = "localhost",
                                               @Named("cassandra.port") val port:Int = 9160,
                                               @Named("cassandra.pool") val poolName:String = "biocache-store-pool",
                                               @Named("cassandra.keyspace") val keyspace:String = "occ",
@@ -58,7 +58,7 @@ class CassandraPersistenceManager @Inject() (
   /**
     * Retrieve an array of objects, parsing the JSON stored.
     */
-  def get(uuid:String, entityName:String) = {
+  def get(uuid: String, entityName: String) = {
     val selector = Pelops.createSelector(poolName)
     val slicePredicate = Selector.newColumnsPredicateAll(true, maxColumnLimit)
     try {
@@ -69,20 +69,20 @@ class CassandraPersistenceManager @Inject() (
         Some(columnList2Map(columnList))
       }
     } catch {
-      case e:Exception => logger.trace(e.getMessage, e); None   //this is expected behaviour where no value exists
+      case e: Exception => logger.trace(e.getMessage, e); None   //this is expected behaviour where no value exists
     }
   }
 
   /**
     * Retrieves a range of columns for the supplied uuid from the specified entity
     */
-  def get(uuid:String, entityName:String, startProperty:String, endProperty:String):Option[java.util.List[Column]]={
+  def get(uuid: String, entityName: String, startProperty: String, endProperty: String): Option[java.util.List[Column]]={
     val selector = Pelops.createSelector(poolName)
     val slicePredicate = Selector.newColumnsPredicate(startProperty,endProperty,false,maxColumnLimit)
     try {
       Some(selector.getColumnsFromRow(entityName, uuid, slicePredicate, ConsistencyLevel.ONE))
     } catch {
-      case e:Exception => None
+      case e: Exception => None
     }
   }
 
@@ -117,13 +117,13 @@ class CassandraPersistenceManager @Inject() (
     * be alright because the index should only be hit for reads via webapp.
     *
     */
-  def getByIndex(uuid:String, entityName:String, idxColumn:String) : Option[Map[String,String]] =
+  def getByIndex(uuid: String, entityName: String, idxColumn: String) : Option[Map[String,String]] =
     getFirstValuesFromIndex(entityName, idxColumn, uuid, Selector.newColumnsPredicateAll(true, maxColumnLimit))
 
   /**
     * Retrieves a specific property value using the index as the retrieval method.
     */
-  def getByIndex(uuid:String, entityName:String, idxColumn:String, propertyName:String) = {
+  def getByIndex(uuid: String, entityName: String, idxColumn: String, propertyName:String) = {
     val map = getFirstValuesFromIndex(entityName, idxColumn, uuid, Selector.newColumnsPredicate(propertyName))
     if(map.isEmpty)
       None
@@ -161,7 +161,7 @@ class CassandraPersistenceManager @Inject() (
     * not swallowed in the guise of being a "NotFoundException". Thus allowing us to terminate a load midcycle.
     *
     */
-  def get(uuid:String, entityName:String, propertyName:String) = {
+  def get(uuid: String, entityName: String, propertyName:String) = {
     try {
       val selector = Pelops.createSelector(poolName)
       val column = selector.getColumnFromRow(entityName, uuid, propertyName, ConsistencyLevel.ONE)
@@ -485,7 +485,7 @@ class CassandraPersistenceManager @Inject() (
   /**
     * Select fields from rows and pass to the supplied function.
     */
-  def selectRows(rowkeys:Seq[String], entityName:String, fields:Seq[String], proc:((Map[String,String])=>Unit)) {
+  def selectRows(rowkeys: Seq[String], entityName: String, fields: Seq[String], proc: ((Map[String,String])=>Unit)) {
     val selector:Selector = Pelops.createSelector(poolName)
     val slicePredicate = Selector.newColumnsPredicate(fields:_*)
 
@@ -508,7 +508,7 @@ class CassandraPersistenceManager @Inject() (
   /**
     * Convert a set of cassandra columns into a key-value pair map.
     */
-  protected def columnList2Map(columnList:java.util.List[Column]) : Map[String,String] = {
+  protected def columnList2Map(columnList: java.util.List[Column]) : Map[String,String] = {
     val map = new mutable.HashMap[String, String]
     val iter = columnList.iterator()
     while(iter.hasNext){

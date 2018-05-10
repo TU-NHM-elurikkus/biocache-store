@@ -268,8 +268,6 @@ object RemoteMediaStore extends MediaStore {
     // already stored?
     val (stored, fileName, imageId) = alreadyStored(uuid, resourceUID, urlToMedia)
 
-    logger.info(s"media: $media | stored: $stored | fileName: $fileName")
-
     // if already stored, just update metadata
     if(stored){
       logger.info("Media file " + urlToMedia + " already stored at " + imageId)
@@ -520,7 +518,10 @@ object LocalMediaStore extends MediaStore {
 
     // check to see if the media is already stored
     val (stored, name, path) = alreadyStored(uuid, resourceUID, urlToMedia)
-    if(stored){
+
+    logger.info(s"media: $media | stored: $stored | name: $name")
+
+    if(stored) {
       logger.debug("Media already stored to: " + path)
       Some(name, path)
     } else {
