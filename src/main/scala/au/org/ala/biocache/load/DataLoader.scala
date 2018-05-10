@@ -353,7 +353,7 @@ trait DataLoader {
           } else if (Config.mediaStore.isValidImage(fileToStore)) {
             imagesBuffer += savedFilePathOrId
           }
-          associatedMediaBuffer += media.mkString(";")
+          associatedMediaBuffer += media.get.metadata.mkString(";")
         }
         case None => logger.warn("Unable to save file: " + fileToStore)
       }
