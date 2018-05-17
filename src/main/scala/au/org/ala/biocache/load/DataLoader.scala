@@ -364,7 +364,7 @@ trait DataLoader {
       val mediaTypeLower = media.get.metadata.getOrElse("type", "Other").toLowerCase
       savedTo match {
         case Some((savedFilename, savedFilePathOrId)) => {
-          if("audio,sound".contains(mediaTypeLower)) {
+          if("audio,sound".contains(mediaTypeLower)) {  // Nick'll be proud
             soundsBuffer += savedFilePathOrId
           } else if(mediaTypeLower == "video") {
             videosBuffer += savedFilePathOrId
