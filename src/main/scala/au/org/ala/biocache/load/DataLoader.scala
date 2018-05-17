@@ -320,14 +320,13 @@ trait DataLoader {
 
     filesToImport.foreach { fileToStore =>
 
-    var mediaType = ""
-
       val media = {
         val multiMediaObject = multimedia.find { media => media.location.toString == fileToStore }
 
         multiMediaObject match {
           case Some(multimedia) => Some(multimedia)
           case None => {
+            var mediaType = ""
             if(Config.mediaStore.isValidSound(fileToStore)) {
               mediaType = "Sound"
             } else if (Config.mediaStore.isValidVideo(fileToStore)) {
@@ -359,22 +358,10 @@ trait DataLoader {
         }
       }
 
-      if(mediaType == "") {
-          if (Config.mediaStore.isValidSound(fileToStore)) {
-            mediaType = "Sound"
-          } else if(Config.mediaStore.isValidVideo(fileToStore)) {
-            mediaType = "Video"
-          } else if(Config.mediaStore.isValidImage(fileToStore)) {
-            mediaType = "Image"
-          } else {
-            mediaType = "Other"
-          }
-      }
-
       // save() checks to see if the media has already been stored
       val savedTo = Config.mediaStore.save(fr.uuid, fr.attribution.dataResourceUid, fileToStore, media)
 
-      val mediaTypeLower = mediaType.toLowerCase
+      val mediaTypeLower = media.get.metadata.getOrElse("type", "Other").toLowerCase
       savedTo match {
         case Some((savedFilename, savedFilePathOrId)) => {
           if("audio,sound".contains(mediaTypeLower)) {
