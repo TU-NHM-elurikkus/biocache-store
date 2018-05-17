@@ -635,7 +635,8 @@ object LocalMediaStore extends MediaStore {
     "oga" -> "audio/oga",
     "ogg" -> "audio/ogg",
     "opus" -> "audio/opus",
-    "wav" -> "audio/wav"
+    "wav" -> "audio/wav",
+    "mp4" -> "audio/mp4"
   )
 
   def getSoundFormats(filePath: String): java.util.Map[String, String] = {
