@@ -1,23 +1,21 @@
 package au.org.ala.biocache.load
 
-import java.net.URL
-
-import au.org.ala.biocache.util.{BiocacheConversions, FileHelper, HttpUtil, SFTPTools}
-import org.slf4j.LoggerFactory
-import au.org.ala.biocache.Config
-import org.apache.commons.io.{FileUtils, FilenameUtils}
 import java.io.{File, FileOutputStream, Writer}
-
-import scala.util.parsing.json.JSON
+import java.net.URL
 import java.util.Date
 
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.slf4j.LoggerFactory
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
+import scala.util.parsing.json.JSON
+
+import au.org.ala.biocache.Config
 import au.org.ala.biocache.parser.DateParser
+import au.org.ala.biocache.model.{FullRecord, Multimedia}
+import au.org.ala.biocache.util.{BiocacheConversions, FileHelper, HttpUtil, SFTPTools}
 import org.gbif.dwc.terms.TermFactory
 
-import scala.collection.mutable.ArrayBuffer
-import au.org.ala.biocache.model.{FullRecord, Multimedia}
-
-import scala.collection.mutable
 
 /**
  * A trait with utility code for loading data into the occurrence store.
@@ -322,18 +320,38 @@ trait DataLoader {
 
     filesToImport.foreach { fileToStore =>
 
+    var mediaType = ""
+
       val media = {
         val multiMediaObject = multimedia.find { media => media.location.toString == fileToStore }
+
         multiMediaObject match {
-          case Some(multimedia) =>
-            Some(multimedia)
+          case Some(multimedia) => Some(multimedia)
           case None => {
+            if(Config.mediaStore.isValidSound(fileToStore)) {
+              mediaType = "Sound"
+            } else if (Config.mediaStore.isValidVideo(fileToStore)) {
+              mediaType = "Video"
+            } else if (Config.mediaStore.isValidImage(fileToStore)) {
+              mediaType = "Image"
+            } else {
+              mediaType = "Other"
+            }
+
             // construct metadata from record
             Some(new Multimedia(new URL(fileToStore), "", Map(
-              "creator" -> fr.occurrence.recordedBy,
+              "coreID" -> fr.occurrence.occurrenceID,
+              "created" -> "",
+              "format" -> "",
+              "type" -> mediaType,
+              "identifier" -> fileToStore,
+              "source" -> "",
               "title" -> fr.classification.scientificName,
+              "references" -> "",
+              "creator" -> fr.occurrence.recordedBy,
               "description" -> fr.occurrence.occurrenceRemarks,
               "license" -> fr.occurrence.license,
+              "publisher" -> "",
               "rights" -> fr.occurrence.rights,
               "rightsHolder" -> fr.occurrence.rightsholder
             )))
@@ -341,21 +359,35 @@ trait DataLoader {
         }
       }
 
+      if(mediaType == "") {
+          if (Config.mediaStore.isValidSound(fileToStore)) {
+            mediaType = "Sound"
+          } else if(Config.mediaStore.isValidVideo(fileToStore)) {
+            mediaType = "Video"
+          } else if(Config.mediaStore.isValidImage(fileToStore)) {
+            mediaType = "Image"
+          } else {
+            mediaType = "Other"
+          }
+      }
+
       // save() checks to see if the media has already been stored
       val savedTo = Config.mediaStore.save(fr.uuid, fr.attribution.dataResourceUid, fileToStore, media)
 
+      val mediaTypeLower = mediaType.toLowerCase
       savedTo match {
         case Some((savedFilename, savedFilePathOrId)) => {
-          if (Config.mediaStore.isValidSound(fileToStore)) {
+          if("audio,sound".contains(mediaTypeLower)) {
             soundsBuffer += savedFilePathOrId
-          } else if (Config.mediaStore.isValidVideo(fileToStore)) {
+          } else if(mediaTypeLower == "video") {
             videosBuffer += savedFilePathOrId
-          } else if (Config.mediaStore.isValidImage(fileToStore)) {
+          } else if(mediaTypeLower == "image") {
             imagesBuffer += savedFilePathOrId
           }
-          associatedMediaBuffer += media.get.metadata.map(_.productIterator.mkString(":")).mkString(";")
+          // associatedMediaBuffer += media.get.metadata.map(_.productIterator.mkString(":")).mkString(";")
+          associatedMediaBuffer += savedFilename
         }
-        case None => logger.warn("Unable to save file: " + fileToStore)
+        case None => logger.debug("Unable to save file: " + fileToStore)
       }
 
       //add the references

@@ -1,28 +1,31 @@
 package au.org.ala.biocache.load
 
+import java.io._
 import java.net.{HttpURLConnection, URI, URL}
 import java.security.MessageDigest
+import java.util
+import java.util.Properties;
 
-import org.apache.commons.codec.digest.DigestUtils
-import org.apache.http.NameValuePair
-import org.apache.http.client.utils.URLEncodedUtils
-import org.apache.http.entity.ContentType
-import org.slf4j.LoggerFactory
-import org.apache.commons.io.{FilenameUtils, FileUtils}
-import java.io._
-import au.org.ala.biocache.model.{Multimedia, FullRecord}
-import au.org.ala.biocache.util.{ HttpUtil, Json}
-import au.org.ala.biocache.Config
-import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.http.entity.mime.{MultipartEntityBuilder, HttpMultipartMode, MultipartEntity}
-import org.apache.http.entity.mime.content.{StringBody, FileBody}
-import org.apache.http.client.methods.HttpPost
-import scala.collection.mutable
-import scala.io.Source
-import org.apache.commons.lang3.StringUtils
 import com.jayway.jsonpath.JsonPath
 import net.minidev.json.JSONArray
-import java.util
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.{FilenameUtils, FileUtils}
+import org.apache.commons.lang3.StringUtils
+import org.apache.http.NameValuePair
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.utils.URLEncodedUtils
+import org.apache.http.entity.ContentType
+import org.apache.http.entity.mime.content.{StringBody, FileBody}
+import org.apache.http.entity.mime.{MultipartEntityBuilder, HttpMultipartMode, MultipartEntity}
+import org.apache.http.impl.client.DefaultHttpClient
+import org.slf4j.LoggerFactory
+import scala.collection.mutable
+import scala.io.Source
+
+import au.org.ala.biocache.Config
+import au.org.ala.biocache.model.{Multimedia, FullRecord}
+import au.org.ala.biocache.util.{ HttpUtil, Json}
+
 
 /**
  * Trait for Media stores to implement.
@@ -270,7 +273,7 @@ object RemoteMediaStore extends MediaStore {
 
     // if already stored, just update metadata
     if(stored){
-      logger.info("Media file " + urlToMedia + " already stored at " + imageId)
+      logger.debug("Media file " + urlToMedia + " already stored at " + imageId)
 
       if(media.isDefined) {
         logger.debug("Updating metadata for image " + imageId)
@@ -511,6 +514,40 @@ object LocalMediaStore extends MediaStore {
   }
 
   /**
+   * Creates/Updates the metadata associated with this file.
+   *
+   * @param fullPath
+   * @param media
+   */
+  private def updateMetadata(name: String, fullPath: String, media: Option[Multimedia]): Unit = {
+      if(media.isDefined  && !fullPath.isEmpty) {
+        var metaFileStreamOut: java.io.FileOutputStream = null
+
+        try {
+          val metaProps = new Properties()
+
+          media.get.metadata.foreach {
+            case(header, value) => metaProps.setProperty(header, value)
+          }
+
+          val metaFile = new File(fullPath + ".properties")
+          metaFileStreamOut = new FileOutputStream(metaFile)
+          metaProps.store(metaFileStreamOut, fullPath)
+
+        } catch {
+          case e: Exception =>
+            logger.warn(s"Unable save file meta for $name | $e.getMessage")
+            None
+
+        } finally {
+          if(metaFileStreamOut != null) {
+            metaFileStreamOut.close()
+          }
+        }
+      }
+  }
+
+  /**
    * Saves the file to local filesystem and returns the file path where the file is stored.
    */
   def save(uuid: String, resourceUID: String, urlToMedia: String,
@@ -519,19 +556,24 @@ object LocalMediaStore extends MediaStore {
     // check to see if the media is already stored
     val (stored, name, path) = alreadyStored(uuid, resourceUID, urlToMedia)
 
-    logger.info(s"media: $media | stored: $stored | name: $name")
+    logger.debug(s"media: $media | stored: $stored | name: $name")
+
+    var result = Some("", "")
 
     if(stored) {
       logger.debug("Media already stored to: " + path)
-      Some(name, path)
+      result = Some(name, path)
+      // if file exists, still try to update metadata
+      updateMetadata(name, path, media)
     } else {
 
       // handle the situation where the urlToMedia does not exits -
       var in: java.io.InputStream = null
       var out: java.io.FileOutputStream = null
 
+      var fullPath = "";
       try {
-        val fullPath = createFilePath(uuid, resourceUID, urlToMedia)
+        fullPath = createFilePath(uuid, resourceUID, urlToMedia)
         val file = new File(fullPath)
         if (!file.exists() || file.length() == 0) {
           val url = new java.net.URL(urlToMedia.replaceAll(" ", "%20"))
@@ -539,7 +581,7 @@ object LocalMediaStore extends MediaStore {
           out = new FileOutputStream(file)
           val buffer: Array[Byte] = new Array[Byte](1024)
           var numRead = 0
-          while ( {
+          while ({
             numRead = in.read(buffer)
             numRead != -1
           }) {
@@ -562,7 +604,7 @@ object LocalMediaStore extends MediaStore {
           }
         }
         // store the media
-        Some((extractFileName(urlToMedia), fullPath))
+        result = Some((extractFileName(urlToMedia), fullPath))
       } catch {
         case e: Exception =>
           logger.warn("Unable to load media " + urlToMedia + ". " + e.getMessage);
@@ -576,7 +618,12 @@ object LocalMediaStore extends MediaStore {
           out.close()
         }
       }
+
+      // after file save try to store/update file metadata as key=value properties file
+      updateMetadata(name, fullPath, media)
     }
+
+    result
   }
 
   val extensionToMimeTypes = Map(

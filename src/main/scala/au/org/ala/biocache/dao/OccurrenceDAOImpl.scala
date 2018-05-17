@@ -102,9 +102,9 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     }
   }
 
-  def getRawProcessedByRowKey(rowKey:String) :Option[Array[FullRecord]] ={
+  def getRawProcessedByRowKey(rowKey:String): Option[Array[FullRecord]] ={
     val map = persistenceManager.get(rowKey, entityName)
-    if(map.isEmpty){
+    if(map.isEmpty) {
       None
     } else {
       // the versions of the record
@@ -117,9 +117,9 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
   /**
     * Get the supplied version based on a rowKey
     */
-  def getByRowKey(rowKey:String, version:Version, includeSensitive:Boolean=false) :Option[FullRecord] ={
+  def getByRowKey(rowKey: String, version: Version, includeSensitive: Boolean=false): Option[FullRecord] = {
     val propertyMap = persistenceManager.get(rowKey, entityName)
-    if (propertyMap.isEmpty) {
+    if(propertyMap.isEmpty) {
       None
     } else {
       val record = FullRecordMapper.createFullRecord(rowKey, propertyMap.get, version)
@@ -132,11 +132,11 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
   /**
     * Get an occurrence, specifying the version of the occurrence.
     */
-  def getByUuid(uuid: String, version: Version, includeSensitive:Boolean=false): Option[FullRecord] = {
+  def getByUuid(uuid: String, version: Version, includeSensitive: Boolean=false): Option[FullRecord] = {
     //get the row key from the supplied uuid
     val rowKey = getRowKeyFromUuid(uuid)
     if(rowKey.isDefined){
-      getByRowKey(rowKey.get, version,includeSensitive)
+      getByRowKey(rowKey.get, version, includeSensitive)
     } else {
       None
     }
@@ -161,7 +161,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
       //persistenceManager.put(uniqueID, "dr", "uuid", newUuid)
       (newUuid, true)
     } else {
-      (recordUUID.get,false)
+      (recordUUID.get, false)
     }
   }
 
@@ -171,17 +171,19 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * Writes the supplied field values to the writer.  The Writer specifies the format in which the record is
     * written.
     */
-  def writeToRecordWriter(writer:RecordWriter, rowKeys: Array[String], fields: Array[String], qaFields:Array[String], includeSensitive:Boolean=false, includeMisc:Boolean=false, miscFields:Array[String] = null, dataToInsert:java.util.Map[String, Array[String]] = null) : Array[String] = {
+  def writeToRecordWriter(writer: RecordWriter, rowKeys: Array[String], fields: Array[String], qaFields: Array[String],
+                          includeSensitive: Boolean=false, includeMisc: Boolean=false, miscFields: Array[String] = null,
+                          dataToInsert: java.util.Map[String, Array[String]] = null) : Array[String] = {
     //get the codes for the qa fields that need to be included in the download
     //TODO fix this in case the value can't be found
     val mfields = fields.toBuffer
     val codes = qaFields.map(value=>AssertionCodes.getByName(value).get.getCode)
     val firstEL = fields.find(value => {elpattern.findFirstIn(value).nonEmpty})
     val firstCL = fields.find(value => {clpattern.findFirstIn(value).nonEmpty})
-    val firstMisc = fields.find(value =>{IndexFields.storeMiscFields.contains(value)})
+    val firstMisc = fields.find(value => {IndexFields.storeMiscFields.contains(value)})
     //user_assertions is boolean in SOLR, FullRecordMapper.userQualityAssertionColumn in Cassandra.
     //because this is a full list it is more useful to have the assertion contents in this requested field.
-    val userAssertions = fields.find(value =>{"user_assertions".equals(value)})
+    val userAssertions = fields.find(value => {"user_assertions".equals(value)})
 
     if(firstEL.isDefined)
       mfields += "el.p"
@@ -220,7 +222,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
       val clMap = if(firstCL.isDefined) Json.toStringMap(fieldMap.getOrElse("cl.p", "{}")) else Map[String,String]()
       val miscMap = if(firstMisc.isDefined || includeMisc)Json.toStringMap(fieldMap.getOrElse(FullRecordMapper.miscPropertiesColumn, "{}")) else Map[String,String]()
       fields.foreach(field => {
-        val fieldValue = field match{
+        val fieldValue = field match {
           case a if elpattern.findFirstIn(a).nonEmpty => elMap.getOrElse(a, "")
           case a if clpattern.findFirstIn(a).nonEmpty => clMap.getOrElse(a, "")
           case a if firstMisc.isDefined && IndexFields.storeMiscFields.contains(a) => miscMap.getOrElse(a, "")
@@ -230,17 +232,17 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
           case _ => if(includeSensitive) sensitiveMap.getOrElse(field, getHackValue(field,fieldMap)) else getHackValue(field,fieldMap)
         }
 
-        //do not add columns not requested
+        // do not add columns not requested
         if (!(addedRowKey && "rowKey".equals(field)) &&
           !(addedUserQAColumn && FullRecordMapper.userQualityAssertionColumn.equals(field))) {
           // if(includeSensitive) sensitiveMap.getOrElse(field, getHackValue(field,fieldMap))else getHackValue(field,fieldMap)
-          //Create a MS Excel compliant CSV file thus field with delimiters are quoted andm embedded quotes are escaped
+          // Create a MS Excel compliant CSV file thus field with delimiters are quoted andm embedded quotes are escaped
           array += fieldValue
         }
 
       })
 
-      //add additional columns
+      // add additional columns
       if (dataToInsert != null && dataToInsert.size > 0) {
         val data = dataToInsert.get(fieldMap.getOrElse("rowKey", ""))
         if (data != null) {
@@ -280,7 +282,8 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * Write to stream in a delimited format (CSV).
     */
   def writeToStream(outputStream: OutputStream, fieldDelimiter: String, recordDelimiter: String,
-                    rowKeys: Array[String], fields: Array[String], qaFields:Array[String], includeSensitive:Boolean=false) {
+                    rowKeys: Array[String], fields: Array[String], qaFields: Array[String],
+                    includeSensitive: Boolean=false) {
     //get the codes for the qa fields that need to be included in the download
     //TODO fix this in case the value can't be found
     val mfields = scala.collection.mutable.ArrayBuffer[String]()
@@ -374,7 +377,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     string.toString()
   }
 
-  def getErrorCodes(map:Map[String, String]):Array[Integer]={
+  def getErrorCodes(map: Map[String, String]): Array[Integer] = {
     val array:Array[List[Integer]] = FullRecordMapper.qaFields.filter(field => map.get(field).getOrElse("[]") != "[]").toArray.map(field => {
       Json.toListWithGeneric(map.get(field).get,classOf[java.lang.Integer])
     }).asInstanceOf[Array[List[Integer]]]
@@ -392,7 +395,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * @param startKey, The row key of the occurrence at which to start the paging
     * @param endKey, The row key of the occurrence at which to end the paging
     */
-  def pageOverAllVersions(proc: ((Option[Array[FullRecord]]) => Boolean),startKey:String = "", endKey:String = "", pageSize: Int = 1000) {
+  def pageOverAllVersions(proc: ((Option[Array[FullRecord]]) => Boolean), startKey: String="", endKey: String="", pageSize: Int = 1000) {
     persistenceManager.pageOverAll(entityName, (guid, map) => {
       //retrieve all versions
       val raw = FullRecordMapper.createFullRecord(guid, map, Raw)
@@ -400,7 +403,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
       val consensus = FullRecordMapper.createFullRecord(guid, map, Consensus)
       //pass all version to the procedure, wrapped in the Option
       proc(Some(Array(raw, processed, consensus)))
-    },startKey, endKey, pageSize)
+    }, startKey, endKey, pageSize)
   }
 
   /**
@@ -411,7 +414,8 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * @param startKey, The row key of the occurrence at which to start the paging
     * @param endKey, The row key of the occurrence at which to end the paging
     */
-  def pageOverAll(version: Version, proc: ((Option[FullRecord]) => Boolean),startKey:String = "", endKey:String = "", pageSize: Int = 1000) {
+  def pageOverAll(version: Version, proc: ((Option[FullRecord]) => Boolean), startKey: String="", endKey: String="",
+                  pageSize: Int=1000) {
     persistenceManager.pageOverAll(entityName, (guid, map) => {
       //retrieve all versions
       val fullRecord = FullRecordMapper.createFullRecord(guid, map, version)
@@ -428,7 +432,8 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * @param startKey, The row key of the occurrence at which to start the paging
     * @param endKey, The row key of the occurrence at which to end the paging
     */
-  def pageOverRawProcessed(proc: (Option[(FullRecord, FullRecord)] => Boolean),startKey:String= "", endKey:String = "", pageSize: Int = 1000) {
+  def pageOverRawProcessed(proc: (Option[(FullRecord, FullRecord)] => Boolean), startKey: String="", endKey: String="",
+                           pageSize: Int = 1000) {
     persistenceManager.pageOverAll(entityName, (guid, map) => {
       //retrieve all versions
       val raw = FullRecordMapper.createFullRecord(guid, map, Versions.RAW)
@@ -446,16 +451,16 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     *
     */
   def conditionalPageOverRawProcessed(proc: (Option[(FullRecord, FullRecord)] => Boolean),
-                                      condition:(Map[String,String]=>Boolean),columnsToRetrieve:Array[String],
-                                      startKey:String = "", endKey:String = "", pageSize: Int = 1000){
+                                      condition: (Map[String, String] => Boolean), columnsToRetrieve: Array[String],
+                                      startKey: String="", endKey: String="", pageSize: Int = 1000) {
     val columns = columnsToRetrieve ++ Array("uuid","rowKey")
-    persistenceManager.pageOverSelect(entityName, (guid, map)=>{
+    persistenceManager.pageOverSelect(entityName, (guid, map) => {
       //val deleted = map.getOrElse(FullRecordMapper.deletedColumn,"false")
       //if(deleted.equals("false")){
-      if(condition(map)){
-        if(map.contains("rowKey")){
-          val recordmap = persistenceManager.get(map.get("rowKey").get,entityName)
-          if(!recordmap.isEmpty){
+      if(condition(map)) {
+        if(map.contains("rowKey")) {
+          val recordmap = persistenceManager.get(map.get("rowKey").get, entityName)
+          if(!recordmap.isEmpty) {
             val raw = FullRecordMapper.createFullRecord(guid, recordmap.get, Versions.RAW)
             val processed = FullRecordMapper.createFullRecord(guid, recordmap.get, Versions.PROCESSED)
             //pass all version to the procedure, wrapped in the Option
@@ -472,7 +477,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
   /**
     * Update the version of the occurrence record.
     */
-  def addRawOccurrence(fr:FullRecord, deleteIfNullValue:Boolean=false) {
+  def addRawOccurrence(fr: FullRecord, deleteIfNullValue: Boolean=false) {
 
     //add the last load time
     fr.lastModifiedTime = new Date
@@ -483,9 +488,11 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     //process the record
     val properties = FullRecordMapper.fullRecord2Map(fr, Versions.RAW)
 
-    //commit
-    if(deleteIfNullValue){
-      properties ++=  fr.getRawFields().filter ({ case (k, v) => {!properties.isDefinedAt(k)}}).map({case (k,v) => {(k,null)}})
+    // commit
+    if(deleteIfNullValue) {
+      properties ++= fr.getRawFields().filter({
+        case (k, v) => {!properties.isDefinedAt(k)}
+      }).map({ case (k, v) => {(k, null)} })
     }
 
 
@@ -495,12 +502,12 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
   /**
     * Update the version of the occurrence record.
     */
-  def addRawOccurrenceBatch(fullRecords: Array[FullRecord], removeNullFields:Boolean = false) {
+  def addRawOccurrenceBatch(fullRecords: Array[FullRecord], removeNullFields: Boolean = false) {
     val batch = scala.collection.mutable.Map[String, Map[String, String]]()
     fullRecords.foreach(fr  => {
       //process the record
       val properties = FullRecordMapper.fullRecord2Map(fr, Versions.RAW)
-      if (removeNullFields) {
+      if(removeNullFields) {
         properties ++= fr.getRawFields().filter({ case (k, v) => {
           !properties.isDefinedAt(k)
         }
@@ -549,7 +556,8 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
   /**
     * Update the occurrence with the supplied record, setting the correct version
     */
-  def updateOccurrence(rowKey: String, fullRecord: FullRecord, assertions: Option[Map[String,Array[QualityAssertion]]], version: Version) {
+  def updateOccurrence(rowKey: String, fullRecord: FullRecord, assertions: Option[Map[String,Array[QualityAssertion]]],
+                       version: Version) {
 
     //construct a map of properties to write
     val properties = FullRecordMapper.fullRecord2Map(fullRecord, version)
@@ -567,7 +575,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     * Update the occurrence with the supplied record, setting the correct version
     */
   def updateOccurrence(rowKey: String, oldRecord: FullRecord, newRecord: FullRecord,
-                       assertions: Option[Map[String,Array[QualityAssertion]]], version: Version) {
+                       assertions: Option[Map[String, Array[QualityAssertion]]], version: Version) {
 
     //construct a map of properties to write
     val oldproperties = FullRecordMapper.fullRecord2Map(oldRecord, version)
