@@ -155,6 +155,8 @@ trait MediaStore {
    */
   def save(uuid: String, resourceUID: String, urlToMedia: String, media: Option[Multimedia]) : Option[(String, String)]
 
+  def loadMetadata(filePath: String): java.util.Map[String, String]
+
   def getSoundFormats(filePath: String): java.util.Map[String, String]
 
   def convertPathsToUrls(fullRecord: FullRecord, baseUrlPath: String) : Unit
@@ -228,6 +230,11 @@ object RemoteMediaStore extends MediaStore {
     } else {
       (false, "", "")
     }
+  }
+
+  def loadMetadata(filePath: String): java.util.Map[String, String] = {
+      val fileMeta = new java.util.HashMap[String, String]()
+      return fileMeta;
   }
 
   /**
@@ -545,6 +552,44 @@ object LocalMediaStore extends MediaStore {
           }
         }
       }
+  }
+
+  /*
+   * Try to load .properties file into a map or return empty map
+   */
+  def loadMetadata(filePath: String): java.util.Map[String, String] = {
+      val fileMeta = new java.util.HashMap[String, String]()
+      var metaFileStreamIn: java.io.FileInputStream = null
+
+      // for prop in properties
+      val metaFile = new File(filePath + ".properties")
+      metaFile.exists match {
+        case true => {
+          val metaProps = new Properties()
+          try {
+            metaFileStreamIn = new FileInputStream(metaFile)
+            metaProps.load(metaFileStreamIn)
+
+          } finally {
+            if(metaFileStreamIn != null) {
+              metaFileStreamIn.close()
+            }
+          }
+
+          metaProps.foreach {
+            case(key, value) => fileMeta.put(key, value)
+          }
+        }
+        case false => Array()
+      }
+
+      val fileFormat = fileMeta.getOrElse("format", "")
+      if(fileFormat == "") {
+          val extension = FilenameUtils.getExtension(filePath).toLowerCase()
+          fileMeta.put("format", extension)
+      }
+
+      return fileMeta;
   }
 
   /**
