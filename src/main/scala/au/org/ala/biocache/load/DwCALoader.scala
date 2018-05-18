@@ -65,10 +65,12 @@ object DwCALoader extends Tool {
       opt("rnf", "remove-null-fields", "Remove the null/Empty fields currently exist in the atlas", { removeNullFields = true })
 
     }
-    if(parser.parse(args)){
+
+    if(parser.parse(args)) {
       val l = new DwCALoader
       l.deleteOldRowKeys(resourceUid)
-      if(localFilePath.isEmpty){
+
+      if(localFilePath.isEmpty) {
         l.load(resourceUid, logRowKeys, testFile)
       } else {
         if(bypassConnParamLookup){
@@ -98,13 +100,15 @@ class DwCALoader extends DataLoader {
    * @param testFile
    * @param forceLoad
    */
-  def load(resourceUid:String, logRowKeys:Boolean=false, testFile:Boolean=false, forceLoad:Boolean = false, removeNullFields:Boolean=false){
-    //remove the old files
+  def load(resourceUid: String, logRowKeys: Boolean=false, testFile: Boolean=false, forceLoad: Boolean=false,
+           removeNullFields: Boolean=false) {
+    // remove the old files
     emptyTempFileStore(resourceUid)
-    //remove the old row keys:
+    // remove the old row keys:
     deleteOldRowKeys(resourceUid)
     retrieveConnectionParameters(resourceUid) match {
-      case None => throw new Exception("Unable to retrieve connection params for " + resourceUid)
+      case None =>
+        throw new Exception("Unable to retrieve connection params for " + resourceUid)
       case Some(dataResourceConfig) =>
         val conceptTerms = mapConceptTerms(dataResourceConfig.uniqueTerms)
         val imageUrl = dataResourceConfig.connectionParams.get("imageUrl")
@@ -113,20 +117,22 @@ class DwCALoader extends DataLoader {
         var loaded = false
         var maxLastModifiedDate:java.util.Date = null
         dataResourceConfig.urls.foreach(url => {
-          //download
-          val (fileName,date) = downloadArchive(url,resourceUid, if(forceLoad) None else dataResourceConfig.dateLastChecked)
-          if(maxLastModifiedDate == null || date.after(maxLastModifiedDate)){
+          // download
+          val lastChecked = if(forceLoad) None else dataResourceConfig.dateLastChecked
+          val (fileName, date) = downloadArchive(url, resourceUid, lastChecked)
+          if(maxLastModifiedDate == null || date.after(maxLastModifiedDate)) {
             maxLastModifiedDate = date
           }
           logger.info("File last modified date: " + maxLastModifiedDate)
-          if(fileName != null){
-            //load the DWC file
-            loadArchive(fileName, resourceUid, conceptTerms, imageUrl, strip, logRowKeys||incremental,testFile, removeNullFields)
+
+          if(fileName != null) {
+            // load the DWC file
+            loadArchive(fileName, resourceUid, conceptTerms, imageUrl, strip, logRowKeys||incremental, testFile, removeNullFields)
             loaded = true
           }
         })
-        //now update the last checked and if necessary data currency dates
-        if(!testFile){
+        // now update the last checked and if necessary data currency dates
+        if(!testFile) {
           updateLastChecked(resourceUid, if(loaded) Some(maxLastModifiedDate) else None)
           if(!loaded){
             setNotLoadedForOtherPhases(resourceUid)
@@ -141,19 +147,24 @@ class DwCALoader extends DataLoader {
       case Some(dataResourceConfig) =>
         val conceptTerms = mapConceptTerms(dataResourceConfig.uniqueTerms)
         val strip = dataResourceConfig.connectionParams.getOrElse("strip", false).asInstanceOf[Boolean]
-        //load the DWC file
-        loadArchive(fileName, resourceUid, conceptTerms, dataResourceConfig.connectionParams.get("imageUrl"), strip, logRowKeys, testFile,removeNullFields)
+        // load the DWC file
+        loadArchive(fileName, resourceUid, conceptTerms, dataResourceConfig.connectionParams.get("imageUrl"), strip,
+                    logRowKeys, testFile, removeNullFields)
     }
   }
 
-  def getUuid(uniqueID:Option[String], star:StarRecord, uniqueTerms:Seq[Term], mappedProperties:Option[Map[String,String]]) : ((String, Boolean), Option[Map[String,String]]) = {
+  def getUuid(uniqueID: Option[String], star: StarRecord, uniqueTerms: Seq[Term],
+              mappedProperties: Option[Map[String, String]]) : ((String, Boolean), Option[Map[String,String]]) = {
     uniqueID match {
-      case Some(value) => (Config.occurrenceDAO.createOrRetrieveUuid(value),mappedProperties)
-      case None => ((Config.occurrenceDAO.createUuid, true), mappedProperties)
+      case Some(value) =>
+        (Config.occurrenceDAO.createOrRetrieveUuid(value), mappedProperties)
+      case None =>
+        ((Config.occurrenceDAO.createUuid, true), mappedProperties)
     }
   }
 
-  def loadArchive(fileName:String, resourceUid:String, uniqueTerms:Seq[Term], imageUrl:Option[String], stripSpaces:Boolean, logRowKeys:Boolean, testFile:Boolean, removeNullFields:Boolean=false){
+  def loadArchive(fileName: String, resourceUid: String, uniqueTerms: Seq[Term], imageUrl: Option[String],
+                  stripSpaces: Boolean, logRowKeys: Boolean, testFile: Boolean, removeNullFields: Boolean=false) {
     logger.info(s"Loading archive: $fileName " +
       s"for resource: $resourceUid, " +
       s"with unique terms: $uniqueTerms, " +
@@ -174,25 +185,28 @@ class DwCALoader extends DataLoader {
     val fieldShortNames = fieldMap.keySet().toList
     val biocacheModelValues = DwC.retrieveCanonicals(fieldShortNames.map(_.simpleName))
 
-    //constructs a map of supplied field name -> biocache model property
+    // constructs a map of supplied field name -> biocache model property
     val fieldToModelMap = (fieldShortNames zip biocacheModelValues).toMap
 
-    //constructs a map of supplied field IDX -> biocache model property
+    // constructs a map of supplied field IDX -> biocache model property
     val fieldShortNameToIdxMap = new mutable.HashMap[Int, String]
 
     fieldMap.foreach({ case (term, field) =>
       val fieldIdx = field.getIndex()
+
       if(fieldIdx != null) {
         DwC.matchTerm(term.simpleName) match {
-          case Some(matchedTerm) => fieldShortNameToIdxMap.put(fieldIdx, matchedTerm.canonical)
-          case None => fieldShortNameToIdxMap.put(fieldIdx, term.simpleName)
+          case Some(matchedTerm) =>
+            fieldShortNameToIdxMap.put(fieldIdx, matchedTerm.canonical)
+          case None =>
+            fieldShortNameToIdxMap.put(fieldIdx, term.simpleName)
         }
       }
     })
 
-    if(logger.isDebugEnabled){
+    if(logger.isDebugEnabled) {
       fieldToModelMap.foreach({ case (dwcShortName, biocacheField) =>
-        logger.debug(s"dwcShortName: $dwcShortName , biocacheField: $biocacheField")
+        logger.debug(s"dwcShortName: $dwcShortName | biocacheField: $biocacheField")
       })
     }
 
@@ -200,8 +214,8 @@ class DwCALoader extends DataLoader {
     var finishTime = System.currentTimeMillis
     var currentBatch = new ArrayBuffer[FullRecord]
 
-    val institutionCodes = Config.indexDAO.getDistinctValues("data_resource_uid:"+resourceUid, "institution_code", 100).getOrElse(List()).toSet[String]
-    val collectionCodes = Config.indexDAO.getDistinctValues("data_resource_uid:"+resourceUid, "collection_code", 100).getOrElse(List()).toSet[String]
+    val institutionCodes = Config.indexDAO.getDistinctValues("data_resource_uid:" + resourceUid, "institution_code", 100).getOrElse(List()).toSet[String]
+    val collectionCodes = Config.indexDAO.getDistinctValues("data_resource_uid:" + resourceUid, "collection_code", 100).getOrElse(List()).toSet[String]
 
     logger.info("The current institution codes for the data resource: " + institutionCodes)
     logger.info("The current collection codes for the data resource: " + collectionCodes)
@@ -209,16 +223,16 @@ class DwCALoader extends DataLoader {
     val newCollCodes = new scala.collection.mutable.HashSet[String]
     val newInstCodes = new scala.collection.mutable.HashSet[String]
 
-    while (iter.hasNext) {
+    while(iter.hasNext) {
 
       count += 1
-      //the newly assigned record UUID
+      // the newly assigned record UUID
       val star = iter.next
 
-      //the details of how to construct the UniqueID belong in the Collectory
-      //val uniqueTermValues = uniqueTerms.map(t => dwc.getProperty(t))
+      // the details of how to construct the UniqueID belong in the Collectory
+      // val uniqueTermValues = uniqueTerms.map(t => dwc.getProperty(t))
       val uniqueID = {
-        //create the unique ID
+        // create the unique ID
         if (!uniqueTerms.isEmpty) {
           val uniqueTermValues = uniqueTerms.map(t => star.core.value(t))
           val id = (List(resourceUid) ::: uniqueTermValues.toList).mkString("|").trim
@@ -228,7 +242,7 @@ class DwCALoader extends DataLoader {
         }
       }
 
-      if(testFile){
+      if(testFile) {
         //check to see if the key has at least on distinguishing value
         val icode = star.core.value(org.gbif.dwc.terms.DwcTerm.institutionCode)
         newInstCodes.add(if(icode == null) "<NULL>" else icode)
@@ -256,7 +270,7 @@ class DwCALoader extends DataLoader {
         fieldTuples.foreach({case(key, value) => logger.debug(s"Not blank fields: $key , value: $value")})
       }
 
-      //lookup the column
+      // lookup the column
       val ((recordUuid, isNew), mappedProps) = getUuid(uniqueID, star, uniqueTerms, None)
       if(mappedProps.isDefined && uniqueID.isDefined){
         Config.persistenceManager.put(uniqueID.get, "occ", mappedProps.get, removeNullFields)
@@ -270,12 +284,12 @@ class DwCALoader extends DataLoader {
       fieldTuples += ("lastModifiedTime" -> loadTime)
       if(isNew){
         fieldTuples += ("firstLoaded" -> loadTime)
-        newCount +=1
+        newCount += 1
       }
 
       // Get any related multimedia
       val multimedia = loadMultimedia(star, DwCALoader.IMAGE_TYPE, imageBase) ++
-        loadMultimedia(star, DwCALoader.MULTIMEDIA_TYPE, imageBase)
+                       loadMultimedia(star, DwCALoader.MULTIMEDIA_TYPE, imageBase)
 
       // If there are no unique terms, use the UUID as a key
       // This isnt ideal and will stop any reloading
@@ -310,12 +324,12 @@ class DwCALoader extends DataLoader {
       }
     }
 
-    if(rowKeyWriter.isDefined){
+    if(rowKeyWriter.isDefined) {
       rowKeyWriter.get.flush
       rowKeyWriter.get.close
     }
 
-    //check to see if the inst/coll codes are new
+    // check to see if the inst/coll codes are new
     if(testFile){
 
       val unknownInstitutions = newInstCodes &~ institutionCodes
@@ -328,7 +342,7 @@ class DwCALoader extends DataLoader {
         logger.warn("Warning there are new collection codes in the set: " + unknownCollections.mkString(","))
       }
 
-      //Report the number of new/existing records
+      // Report the number of new/existing records
       logger.info("There are " + count + " records in the file. The number of NEW records: " + newCount)
     }
 
@@ -350,14 +364,18 @@ class DwCALoader extends DataLoader {
     if (!star.hasExtension(rowType)) {
       return List.empty
     }
+
     val records = star.extension(rowType).asScala
     val multimedia = new ListBuffer[Multimedia]
     records.foreach { row =>
       val terms = row.terms.filter { term => Option(row.value(term)).isDefined}
       val metadata = terms.map { term => term -> row.value(term) }.toMap[Term, String]
+
       locateMultimedia(row, imageBase) match {
-        case Some(location) => multimedia.add(Multimedia.create(location, metadata))
-        case None => logger.info("No location found for multimedia typed row: " + row)
+        case Some(location) =>
+          multimedia.add(Multimedia.create(location, metadata))
+        case None =>
+          logger.info(s"No location found for multimedia typed row: $row")
       }
     }
     multimedia
@@ -365,7 +383,7 @@ class DwCALoader extends DataLoader {
 
   def locateMultimedia(row: Record, imageBase: URL): Option[URL] = {
     val identifier = row.value(DcTerm.identifier)
-    if(identifier != null){
+    if(identifier != null) {
       Some(new URL(imageBase, identifier))
     } else {
       None

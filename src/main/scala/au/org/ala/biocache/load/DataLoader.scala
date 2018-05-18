@@ -1,23 +1,21 @@
 package au.org.ala.biocache.load
 
-import java.net.URL
-
-import au.org.ala.biocache.util.{BiocacheConversions, FileHelper, HttpUtil, SFTPTools}
-import org.slf4j.LoggerFactory
-import au.org.ala.biocache.Config
-import org.apache.commons.io.{FileUtils, FilenameUtils}
 import java.io.{File, FileOutputStream, Writer}
-
-import scala.util.parsing.json.JSON
+import java.net.URL
 import java.util.Date
 
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.slf4j.LoggerFactory
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
+import scala.util.parsing.json.JSON
+
+import au.org.ala.biocache.Config
 import au.org.ala.biocache.parser.DateParser
+import au.org.ala.biocache.model.{FullRecord, Multimedia}
+import au.org.ala.biocache.util.{BiocacheConversions, FileHelper, HttpUtil, SFTPTools}
 import org.gbif.dwc.terms.TermFactory
 
-import scala.collection.mutable.ArrayBuffer
-import au.org.ala.biocache.model.{FullRecord, Multimedia}
-
-import scala.collection.mutable
 
 /**
  * A trait with utility code for loading data into the occurrence store.
@@ -34,7 +32,7 @@ trait DataLoader {
   val loadTime = org.apache.commons.lang.time.DateFormatUtils.format(new java.util.Date, "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val sftpPattern = """sftp://([a-zA-z\.]*):([0-9a-zA-Z_/\.\-]*)""".r
 
-  def emptyTempFileStore(resourceUid:String) = {
+  def emptyTempFileStore(resourceUid: String) = {
     FileUtils.deleteQuietly(new File(temporaryFileStore + File.separator + resourceUid))
   }
 
@@ -43,7 +41,7 @@ trait DataLoader {
    * @param resourceUid
    * @return
    */
-  def getDeletedFileWriter(resourceUid:String):java.io.FileWriter ={
+  def getDeletedFileWriter(resourceUid: String):java.io.FileWriter ={
     val file =  new File(Config.deletedFileStore +File.separator + resourceUid+File.separator+"deleted.txt")
     FileUtils.forceMkdir(file.getParentFile)
     new java.io.FileWriter(file)
@@ -69,7 +67,7 @@ trait DataLoader {
    * Sampling, Processing and Indexing look for the row key file.
    * An empty file should be enough to prevent the phase from going ahead...
    */
-  def setNotLoadedForOtherPhases(resourceUid:String){
+  def setNotLoadedForOtherPhases(resourceUid: String){
     def writer = getRowKeyWriter(resourceUid, true)
     if(writer.isDefined){
       writer.get.flush
@@ -100,7 +98,7 @@ trait DataLoader {
    */
   def retrieveConnectionParameters(resourceUid: String) : Option[DataResourceConfig] = try {
 
-    //full document
+    // full document
     val map = getDataResourceDetailsAsMap(resourceUid)
 
     //connection details
@@ -118,14 +116,14 @@ trait DataLoader {
       }
     }
 
-    //retrieve the unique terms for this data resource
+    // retrieve the unique terms for this data resource
     val uniqueTerms = connectionParameters.get("termsForUniqueKey") match {
       case Some(list: List[String]) => list
       case Some(singleValue: String) => List(singleValue)
       case None => List[String]()
     }
 
-    //optional config params for custom services
+    // optional config params for custom services
     val customParams = protocol.asInstanceOf[String].toLowerCase match {
       // Only current data resource using this is dr710
       case "customwebservice" => {
@@ -135,11 +133,11 @@ trait DataLoader {
       case _ => Map[String, String]()
     }
 
-    //last checked date
+    // last checked date
     val lastChecked = map("lastChecked").asInstanceOf[String]
     val dateLastChecked = DateParser.parseStringToDate(lastChecked)
 
-    //return the config
+    // return the config
     Some(new DataResourceConfig(protocol,
       urls.asInstanceOf[List[String]],
       uniqueTerms,
@@ -178,19 +176,19 @@ trait DataLoader {
       uniqueId
   }
 
-  def load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], multimedia:Seq[Multimedia]) : Boolean = {
-    load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], true, false, false, None, multimedia, false)
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], multimedia: Seq[Multimedia]) : Boolean = {
+    load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], true, false, false, None, multimedia, false)
   }
 
-  def load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String]) : Boolean = {
-    load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], true, false, false, None, List(), false)
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String]) : Boolean = {
+    load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], true, false, false, None, List(), false)
   }
 
-  def load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], updateLastModified:Boolean) : Boolean = {
-    load(dataResourceUid:String, fr:FullRecord, identifyingTerms:Seq[String], updateLastModified, false, false, None, List(), false)
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean) : Boolean = {
+    load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified, false, false, None, List(), false)
   }
 
-  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean, downloadMedia: Boolean, deleteIfNullValue: Boolean):Boolean ={
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean, downloadMedia: Boolean, deleteIfNullValue: Boolean): Boolean ={
     load(dataResourceUid, fr, identifyingTerms, updateLastModified, downloadMedia, false, None, List(), deleteIfNullValue)
   }
 
@@ -206,7 +204,9 @@ trait DataLoader {
    * @param rowKeyWriter
    * @return
    */
-  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean, downloadMedia: Boolean, stripSpaces: Boolean, rowKeyWriter: Option[Writer], multimedia: Seq[Multimedia], deleteIfNullValue: Boolean): Boolean = {
+  def load(dataResourceUid: String, fr: FullRecord, identifyingTerms: Seq[String], updateLastModified: Boolean,
+           downloadMedia: Boolean, stripSpaces: Boolean, rowKeyWriter: Option[Writer], multimedia: Seq[Multimedia],
+           deleteIfNullValue: Boolean): Boolean = {
 
     //the details of how to construct the UniqueID belong in the Collectory
     val uniqueID = if(identifyingTerms.isEmpty) {
@@ -227,42 +227,42 @@ trait DataLoader {
       }
     }
 
-    //add the full record
+    // add the full record
     fr.uuid = recordUuid
-    //The row key is the uniqueID for the record. This will always start with the dataResourceUid
+    // The row key is the uniqueID for the record. This will always start with the dataResourceUid
     fr.rowKey = if(uniqueID.isEmpty) {
       dataResourceUid + "|" + recordUuid
     } else {
       uniqueID.get
     }
 
-    //write the rowkey to file if a writer is provided. allows large data resources to be
-    //incrementally updated and only process/index changes
+    // write the rowkey to file if a writer is provided. allows large data resources to be
+    // incrementally updated and only process/index changes
     if(rowKeyWriter.isDefined){
-      rowKeyWriter.get.write(fr.rowKey+"\n")
+      rowKeyWriter.get.write(fr.rowKey + "\n")
     }
 
-    //The last load time
+    // The last load time
     if(updateLastModified){
       fr.lastModifiedTime = loadTime
     }
 
-    //set first loaded date indicating when this record was first loaded
-    if(isNew){
+    // set first loaded date indicating when this record was first loaded
+    if(isNew) {
       fr.firstLoaded = loadTime
     }
 
     fr.attribution.dataResourceUid = dataResourceUid
 
-    //process the media for this record
+    // process the media for this record
     processMedia(dataResourceUid, fr, multimedia)
 
-    //load the record
-    Config.occurrenceDAO.addRawOccurrence(fr,deleteIfNullValue)
+    // load the record
+    Config.occurrenceDAO.addRawOccurrence(fr, deleteIfNullValue)
     true
   }
 
-  def filterURLs(associatedMedia: Seq[String], suppliedMedia: Seq[String]) : Seq[String] = {
+  def filterURLs(associatedMedia: Seq[String], suppliedMedia: Seq[String]): Seq[String] = {
     val media = new ArrayBuffer[String]
 
     if (Config.deduplicatePlutofLinks) {
@@ -276,11 +276,9 @@ trait DataLoader {
       media ++= otherAM
       media ++= otherSM
 
-      media ++= (if (plutofAM.length == plutofSM.length) {
-        plutofSM
-      } else {
-        plutofAM
-      })
+      // add only supplied media (media extension data) where it has also metadata
+      // plutof associated media is duplicated there and is not needed
+      media ++= plutofSM
     } else {
       media ++= associatedMedia
       media ++= suppliedMedia
@@ -300,8 +298,8 @@ trait DataLoader {
    */
   def processMedia(dataResourceUid: String, fr: FullRecord, multimedia: Seq[Multimedia] = Seq.empty[Multimedia]) : FullRecord = {
 
-    //download the media - checking if it exists already
-    //supplied media comes from a separate source. If it's also listed in the associatedMedia then don't double-load it
+    // download the media - checking if it exists already
+    // supplied media comes from a separate source. If it's also listed in the associatedMedia then don't double-load it
     val suppliedMedia = multimedia map { media => media.location.toString }
     val associatedMedia = DownloadMedia.unpackAssociatedMedia(fr.occurrence.associatedMedia).filter { url =>
       suppliedMedia.forall(!_.endsWith(url))
@@ -324,15 +322,35 @@ trait DataLoader {
 
       val media = {
         val multiMediaObject = multimedia.find { media => media.location.toString == fileToStore }
+
         multiMediaObject match {
           case Some(multimedia) => Some(multimedia)
           case None => {
-            //construct metadata from record
+            var mediaType = ""
+            if(Config.mediaStore.isValidSound(fileToStore)) {
+              mediaType = "Sound"
+            } else if (Config.mediaStore.isValidVideo(fileToStore)) {
+              mediaType = "Video"
+            } else if (Config.mediaStore.isValidImage(fileToStore)) {
+              mediaType = "Image"
+            } else {
+              mediaType = "Other"
+            }
+
+            // construct metadata from record
             Some(new Multimedia(new URL(fileToStore), "", Map(
-              "creator" -> fr.occurrence.recordedBy,
+              "coreID" -> fr.occurrence.occurrenceID,
+              "created" -> "",
+              "format" -> "",
+              "type" -> mediaType,
+              "identifier" -> fileToStore,
+              "source" -> "",
               "title" -> fr.classification.scientificName,
+              "references" -> "",
+              "creator" -> fr.occurrence.recordedBy,
               "description" -> fr.occurrence.occurrenceRemarks,
               "license" -> fr.occurrence.license,
+              "publisher" -> "",
               "rights" -> fr.occurrence.rights,
               "rightsHolder" -> fr.occurrence.rightsholder
             )))
@@ -342,22 +360,25 @@ trait DataLoader {
 
       // save() checks to see if the media has already been stored
       val savedTo = Config.mediaStore.save(fr.uuid, fr.attribution.dataResourceUid, fileToStore, media)
+
+      val mediaTypeLower = media.get.metadata.getOrElse("type", "Other").toLowerCase
       savedTo match {
         case Some((savedFilename, savedFilePathOrId)) => {
-          if (Config.mediaStore.isValidSound(fileToStore)) {
+          if("audio,sound".contains(mediaTypeLower)) {  // Nick'll be proud
             soundsBuffer += savedFilePathOrId
-          } else if (Config.mediaStore.isValidVideo(fileToStore)) {
+          } else if(mediaTypeLower == "video") {
             videosBuffer += savedFilePathOrId
-          } else if (Config.mediaStore.isValidImage(fileToStore)) {
+          } else if(mediaTypeLower == "image") {
             imagesBuffer += savedFilePathOrId
           }
+          // associatedMediaBuffer += media.get.metadata.map(_.productIterator.mkString(":")).mkString(";")
           associatedMediaBuffer += savedFilename
         }
-        case None => logger.warn("Unable to save file: " + fileToStore)
+        case None => logger.debug("Unable to save file: " + fileToStore)
       }
 
       //add the references
-      fr.occurrence.associatedMedia = associatedMediaBuffer.toArray.mkString(";")
+      fr.occurrence.associatedMedia = associatedMediaBuffer.toArray.mkString(" | ")
       fr.occurrence.images = imagesBuffer.toArray
       fr.occurrence.sounds = soundsBuffer.toArray
       fr.occurrence.videos = videosBuffer.toArray
@@ -401,7 +422,7 @@ trait DataLoader {
       }
     } else {
       logger.info(s"Unable to extract a new file for $resourceUid at $url")
-      (null,null)
+      (null, null)
     }
   }
 

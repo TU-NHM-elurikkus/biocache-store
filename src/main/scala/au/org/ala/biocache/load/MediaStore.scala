@@ -1,28 +1,31 @@
 package au.org.ala.biocache.load
 
+import java.io._
 import java.net.{HttpURLConnection, URI, URL}
 import java.security.MessageDigest
+import java.util
+import java.util.Properties;
 
-import org.apache.commons.codec.digest.DigestUtils
-import org.apache.http.NameValuePair
-import org.apache.http.client.utils.URLEncodedUtils
-import org.apache.http.entity.ContentType
-import org.slf4j.LoggerFactory
-import org.apache.commons.io.{FilenameUtils, FileUtils}
-import java.io._
-import au.org.ala.biocache.model.{Multimedia, FullRecord}
-import au.org.ala.biocache.util.{ HttpUtil, Json}
-import au.org.ala.biocache.Config
-import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.http.entity.mime.{MultipartEntityBuilder, HttpMultipartMode, MultipartEntity}
-import org.apache.http.entity.mime.content.{StringBody, FileBody}
-import org.apache.http.client.methods.HttpPost
-import scala.collection.mutable
-import scala.io.Source
-import org.apache.commons.lang3.StringUtils
 import com.jayway.jsonpath.JsonPath
 import net.minidev.json.JSONArray
-import java.util
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.{FilenameUtils, FileUtils}
+import org.apache.commons.lang3.StringUtils
+import org.apache.http.NameValuePair
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.client.utils.URLEncodedUtils
+import org.apache.http.entity.ContentType
+import org.apache.http.entity.mime.content.{StringBody, FileBody}
+import org.apache.http.entity.mime.{MultipartEntityBuilder, HttpMultipartMode, MultipartEntity}
+import org.apache.http.impl.client.DefaultHttpClient
+import org.slf4j.LoggerFactory
+import scala.collection.mutable
+import scala.io.Source
+
+import au.org.ala.biocache.Config
+import au.org.ala.biocache.model.{Multimedia, FullRecord}
+import au.org.ala.biocache.util.{ HttpUtil, Json}
+
 
 /**
  * Trait for Media stores to implement.
@@ -78,7 +81,7 @@ trait MediaStore {
     val md = MessageDigest.getInstance("MD5")
     val fileName = extractSimpleFileName(urlToMedia)
     val extension = FilenameUtils.getExtension(fileName)
-    if(extension !=null && extension !="") {
+    if(extension != null && extension != "") {
       DigestUtils.md5Hex(fileName) + "." + extension
     } else {
       DigestUtils.md5Hex(fileName)
@@ -111,11 +114,11 @@ trait MediaStore {
    */
   def isAccessible(urlString: String): Boolean = {
 
-    if(StringUtils.isBlank(urlString)){
+    if(StringUtils.isBlank(urlString)) {
       return false
     }
 
-    val urlToTest = if (urlString.startsWith(Config.mediaFileStore)){
+    val urlToTest = if(urlString.startsWith(Config.mediaFileStore)) {
       "file://" + urlString
     } else {
       urlString
@@ -151,6 +154,8 @@ trait MediaStore {
    * @return
    */
   def save(uuid: String, resourceUID: String, urlToMedia: String, media: Option[Multimedia]) : Option[(String, String)]
+
+  def loadMetadata(filePath: String): java.util.Map[String, String]
 
   def getSoundFormats(filePath: String): java.util.Map[String, String]
 
@@ -190,8 +195,8 @@ object RemoteMediaStore extends MediaStore {
    */
   def alreadyStored(uuid: String, resourceUID: String, urlToMedia: String): (Boolean, String, String) = {
 
-    //check image store for the supplied resourceUID/UUID/Filename combination
-    //http://images.ala.org.au/ws/findImagesByOriginalFilename?
+    // check image store for the supplied resourceUID/UUID/Filename combination
+    // http://images.ala.org.au/ws/findImagesByOriginalFilename?
     // filenames=http://biocache.ala.org.au/biocache-media/dr836/29790/1b6c48ab-0c11-4d2e-835e-85d016f335eb/PWCnSmwl.jpeg
     val jsonToPost = Json.toJSON(Map("filenames" -> Array(constructFileID(resourceUID, uuid, urlToMedia))))
 
@@ -227,6 +232,11 @@ object RemoteMediaStore extends MediaStore {
     }
   }
 
+  def loadMetadata(filePath: String): java.util.Map[String, String] = {
+      val fileMeta = new java.util.HashMap[String, String]()
+      return fileMeta;
+  }
+
   /**
    * Construct the ID used by the image store. Changing this will cause duplication
    * problems with existing image resources as this is used to check uniqueness.
@@ -249,8 +259,8 @@ object RemoteMediaStore extends MediaStore {
    */
   def save(uuid: String, resourceUID: String, urlToMedia: String, media: Option[Multimedia]): Option[(String, String)] = {
 
-    //is the supplied URL an image service URL ?? If so extract imageID and return.....
-    if(urlToMedia.startsWith(Config.remoteMediaStoreUrl)){
+    // is the supplied URL an image service URL ?? If so extract imageID and return.....
+    if(urlToMedia.startsWith(Config.remoteMediaStoreUrl)) {
       logger.info("Remote media store URL recognised: " + urlToMedia)
       //  http://images.ala.org.au/image/proxyImageThumbnailLarge?imageId=119d85b5-76cb-4d1d-af30-e141706be8bf
       val uri = new URI(urlToMedia)
@@ -265,24 +275,25 @@ object RemoteMediaStore extends MediaStore {
       }
     }
 
-    //already stored?
+    // already stored?
     val (stored, fileName, imageId) = alreadyStored(uuid, resourceUID, urlToMedia)
 
-    //if already stored, just update metadata
+    // if already stored, just update metadata
     if(stored){
-      logger.info("Media file " + urlToMedia + " already stored at " + imageId)
-      if(media.isDefined){
-        logger.info("Updating metadata for image " + imageId)
+      logger.debug("Media file " + urlToMedia + " already stored at " + imageId)
+
+      if(media.isDefined) {
+        logger.debug("Updating metadata for image " + imageId)
         updateMetadata(imageId, media.get)
       }
       Some((fileName, imageId))
     } else {
-      //download to temp file and upload image
+      // download to temp file and upload image
       downloadToTmpFile(resourceUID, uuid, urlToMedia) match {
         case Some(tmpFile) => {
           try {
             val imageId = uploadImage(uuid, resourceUID, urlToMedia, tmpFile, media)
-            logger.info("Media file " + urlToMedia + " stored to " + imageId)
+            logger.debug("Media file " + urlToMedia + " stored to " + imageId)
             if(imageId.isDefined){
               Some((extractFileName(urlToMedia), imageId.getOrElse("")))
             } else {
@@ -307,10 +318,7 @@ object RemoteMediaStore extends MediaStore {
       try {
         val buffer: Array[Byte] = new Array[Byte](1024)
         var numRead = 0
-        while ( {
-          numRead = in.read(buffer);
-          numRead != -1
-        }) {
+        while({ numRead = in.read(buffer); numRead != -1 }) {
           out.write(buffer, 0, numRead)
           out.flush
         }
@@ -344,7 +352,7 @@ object RemoteMediaStore extends MediaStore {
   private def updateMetadata(imageId:String, media: Multimedia): Unit = {
 
     logger.info(s"Updating the metadata for $imageId")
-    //upload an image
+    // upload an image
     val httpClient = new DefaultHttpClient()
     try {
       val entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE)
@@ -460,7 +468,7 @@ object LocalMediaStore extends MediaStore {
   /** Some unix filesystems has a limit of 32k files per directory */
   val limit = 32000
 
-  def getImageFormats(fileName:String) : java.util.Map[String, String] = {
+  def getImageFormats(fileName: String) : java.util.Map[String, String] = {
     val url = convertPathToUrl(fileName)
     val dp = url.lastIndexOf(".")
     val extension = if (dp >= 0) url.substring(dp) else ""
@@ -505,29 +513,112 @@ object LocalMediaStore extends MediaStore {
       File.separator + uuid
 
     val directory = new File(absoluteDirectoryPath)
-    if (!directory.exists) FileUtils.forceMkdir(directory)
+    if (!directory.exists) {
+      FileUtils.forceMkdir(directory)
+    }
 
     directory.getAbsolutePath + File.separator + extractFileName(urlToMedia)
   }
 
   /**
+   * Creates/Updates the metadata associated with this file.
+   *
+   * @param fullPath
+   * @param media
+   */
+  private def updateMetadata(name: String, fullPath: String, media: Option[Multimedia]): Unit = {
+      if(media.isDefined  && !fullPath.isEmpty) {
+        var metaFileStreamOut: java.io.FileOutputStream = null
+
+        try {
+          val metaProps = new Properties()
+
+          media.get.metadata.foreach {
+            case(header, value) => metaProps.setProperty(header, value)
+          }
+
+          val metaFile = new File(fullPath + ".properties")
+          metaFileStreamOut = new FileOutputStream(metaFile)
+          metaProps.store(metaFileStreamOut, fullPath)
+
+        } catch {
+          case e: Exception =>
+            logger.warn(s"Unable save file meta for $name | $e.getMessage")
+            None
+
+        } finally {
+          if(metaFileStreamOut != null) {
+            metaFileStreamOut.close()
+          }
+        }
+      }
+  }
+
+  /*
+   * Try to load .properties file into a map or return empty map
+   */
+  def loadMetadata(filePath: String): java.util.Map[String, String] = {
+      val fileMeta = new java.util.HashMap[String, String]()
+      var metaFileStreamIn: java.io.FileInputStream = null
+
+      // for prop in properties
+      val metaFile = new File(filePath + ".properties")
+      metaFile.exists match {
+        case true => {
+          val metaProps = new Properties()
+          try {
+            metaFileStreamIn = new FileInputStream(metaFile)
+            metaProps.load(metaFileStreamIn)
+
+          } finally {
+            if(metaFileStreamIn != null) {
+              metaFileStreamIn.close()
+            }
+          }
+
+          metaProps.foreach {
+            case(key, value) => fileMeta.put(key, value)
+          }
+        }
+        case false => Array()
+      }
+
+      val fileFormat = fileMeta.getOrElse("format", "")
+      if(fileFormat == "") {
+          val extension = FilenameUtils.getExtension(filePath).toLowerCase()
+          fileMeta.put("format", extension)
+      }
+
+      return fileMeta;
+  }
+
+  /**
    * Saves the file to local filesystem and returns the file path where the file is stored.
    */
-  def save(uuid: String, resourceUID: String, urlToMedia: String, media: Option[Multimedia]): Option[(String, String)] = {
+  def save(uuid: String, resourceUID: String, urlToMedia: String,
+           media: Option[Multimedia]): Option[(String, String)] = {
 
-    //check to see if the media is already stored
+    // check to see if the media is already stored
     val (stored, name, path) = alreadyStored(uuid, resourceUID, urlToMedia)
-    if(stored){
-      logger.info("Media already stored to: " + path)
-      Some(name, path)
+
+    logger.debug(s"media: $media | stored: $stored | name: $name")
+
+    var result = Some("", "")
+
+    if(stored) {
+      logger.debug("Media already stored to: " + path)
+      result = Some(name, path)
+      // if file exists, still try to update metadata
+      updateMetadata(name, path, media)
     } else {
 
-      //handle the situation where the urlToMedia does not exits -
+      // handle the situation where the urlToMedia does not exits -
       var in: java.io.InputStream = null
       var out: java.io.FileOutputStream = null
 
+      var fullPath = "";
       try {
-        val fullPath = createFilePath(uuid, resourceUID, urlToMedia)
+        fullPath = createFilePath(uuid, resourceUID, urlToMedia)
         val file = new File(fullPath)
         if (!file.exists() || file.length() == 0) {
           val url = new java.net.URL(urlToMedia.replaceAll(" ", "%20"))
@@ -535,42 +626,49 @@ object LocalMediaStore extends MediaStore {
           out = new FileOutputStream(file)
           val buffer: Array[Byte] = new Array[Byte](1024)
           var numRead = 0
-          while ( {
+          while ({
             numRead = in.read(buffer)
             numRead != -1
           }) {
             out.write(buffer, 0, numRead)
             out.flush
           }
-          logger.info("File saved to: " + fullPath)
-          //is this file an image???
+          logger.debug("File saved to: " + fullPath)
+          // is this file an image???
           if (isValidImageURL(urlToMedia)) {
             Thumbnailer.generateAllSizes(new File(fullPath))
           } else {
-            logger.warn("Invalid media file. Not generating derivatives for: " + fullPath)
+            logger.debug("Invalid media file. Not generating derivatives for: " + fullPath)
           }
         } else {
-          logger.info("File previously saved to: " + fullPath)
+          logger.debug("File previously saved to: " + fullPath)
           if (isValidImageURL(urlToMedia)) {
             Thumbnailer.generateAllSizes(new File(fullPath))
           } else {
-            logger.warn("Invalid media file. Not generating derivatives for: " + fullPath)
+            logger.debug("Invalid media file. Not generating derivatives for: " + fullPath)
           }
         }
-        //store the media
-        Some((extractFileName(urlToMedia), fullPath))
+        // store the media
+        result = Some((extractFileName(urlToMedia), fullPath))
       } catch {
-        case e: Exception => logger.warn("Unable to load media " + urlToMedia + ". " + e.getMessage); None
+        case e: Exception =>
+          logger.warn("Unable to load media " + urlToMedia + ". " + e.getMessage);
+          None
       } finally {
-        if (in != null) {
+        if(in != null) {
           in.close()
         }
 
-        if (out != null) {
+        if(out != null) {
           out.close()
         }
       }
+
+      // after file save try to store/update file metadata as key=value properties file
+      updateMetadata(name, fullPath, media)
     }
+
+    result
   }
 
   val extensionToMimeTypes = Map(
@@ -582,7 +680,8 @@ object LocalMediaStore extends MediaStore {
     "oga" -> "audio/oga",
     "ogg" -> "audio/ogg",
     "opus" -> "audio/opus",
-    "wav" -> "audio/wav"
+    "wav" -> "audio/wav",
+    "mp4" -> "audio/mp4"
   )
 
   def getSoundFormats(filePath: String): java.util.Map[String, String] = {
@@ -594,11 +693,12 @@ object LocalMediaStore extends MediaStore {
         filenames.foreach(f => {
           val extension = FilenameUtils.getExtension(f).toLowerCase()
           val mimeType = extensionToMimeTypes.getOrElse(extension, "")
-          formats.put(mimeType,convertPathToUrl(file.getParent + File.separator + f))
+          formats.put(mimeType, convertPathToUrl(file.getParent + File.separator + f))
         })
       }
       case false => Array()
     }
+
     formats
   }
 }

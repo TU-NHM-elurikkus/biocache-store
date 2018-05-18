@@ -142,7 +142,7 @@ object Config {
   }
 
   val blacklistedMediaUrls = {
-    val blacklistMediaUrlsFile = configModule.properties.getProperty("blacklist.media.file","/data/biocache/config/blacklistMediaUrls.txt")
+    val blacklistMediaUrlsFile = configModule.properties.getProperty("blacklist.media.file", "/data/biocache/config/blacklistMediaUrls.txt")
     if(new File(blacklistMediaUrlsFile).exists()){
       logger.info("Using the set of blacklisted media URLs defined in: " + blacklistMediaUrlsFile)
       Source.fromFile(new File(blacklistMediaUrlsFile)).getLines().map(_.trim()).toList

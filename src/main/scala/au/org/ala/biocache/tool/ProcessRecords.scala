@@ -68,7 +68,7 @@ object ProcessRecords extends Tool with IncrementalTool {
       opt("acrk", "abort if no row key file found",{ abortIfNotRowKeyFile = true })
     }
 
-    if(parser.parse(args)){
+    if(parser.parse(args)) {
 
       if(!dataResourceUid.isEmpty && checkRowKeyFile){
         val (hasRowKey, retrievedRowKeyFile) = ProcessRecords.hasRowKey(dataResourceUid.get)
@@ -92,51 +92,65 @@ object ProcessRecords extends Tool with IncrementalTool {
   /**
    * Processes the supplied row keys in a Thread
    */
-  def processRecords(file:File, threads: Int, startUuid:Option[String]) : Unit = {
+  def processRecords(file: File, threads: Int, startUuid:Option[String]) : Unit = {
     processRecords0(file, threads, startUuid)
   }
 
   /**
     * Process the records using the supplied number of threads
     */
-  def processRecords(threads: Int, firstKey:Option[String], dr: Option[String], checkDeleted:Boolean=false,
-                     callback:ObserverCallback = null, lastKey:Option[String]=None): Unit = {
+  def processRecords(threads: Int, firstKey: Option[String], dr: Option[String], checkDeleted: Boolean=false,
+                     callback: ObserverCallback = null, lastKey: Option[String] = None): Unit = {
     processRecords0(null, threads, firstKey, dr, checkDeleted, callback, lastKey)
   }
 
   /**
     * Processes a list of records
     */
-  def processRecords(rowKeys:List[String]): Unit ={
-    val file:File = File.createTempFile("uuids","")
+  def processRecords(rowKeys: List[String]): Unit = {
+    val file: File = File.createTempFile("uuids","")
     FileUtils.writeStringToFile(file, rowKeys.mkString("\n"))
 
     processRecords(file, 4, None)
   }
 
 
-  def processRecords0(file:File, threads: Int, startUuid:Option[String], dr: Option[String] = null,
-                     checkDeleted:Boolean=false, callback:ObserverCallback = null, lastKey:Option[String]=None) : Unit = {
+  def processRecords0(file: File, threads: Int, startUuid: Option[String], dr: Option[String] = null,
+                      checkDeleted: Boolean=false, callback: ObserverCallback = null,
+                      lastKey: Option[String]=None): Unit = {
     var buff = new LinkedBlockingQueue[Object](1000)
     var writeBuffer = new LinkedBlockingQueue[Object](threads)
     var ids = 0
-    val writer = {val p = new ProcessedBatchWriter(writeBuffer, callback); p.start; p}
+    val writer = {
+        val p = new ProcessedBatchWriter(writeBuffer, callback);
+        p.start;
+        p
+    }
+
     logger.info("writer status: " + writer.getState)
-    val pool = Array.fill(threads){ val p = new Consumer(Actor.self,ids,buff, writeBuffer); ids +=1; p.start; p }
+    val pool = Array.fill(threads) {
+        val p = new Consumer(Actor.self, ids,buff, writeBuffer);
+        ids +=1; p.start;
+        p
+    }
+
     logger.info("Starting to process a list of records...")
     val start = System.currentTimeMillis
     val startTime = System.currentTimeMillis
     var finishTime = System.currentTimeMillis
 
-    //use this variable to evenly distribute the actors work load
-    val count:Int = {
-      if (file != null) readUuidList(file, startUuid, buff)
-      else readFromDB(startUuid, dr, checkDeleted, lastKey, buff)
+    // use this variable to evenly distribute the actors work load
+    val count: Int = {
+      if (file != null) {
+        readUuidList(file, startUuid, buff)
+      } else {
+        readFromDB(startUuid, dr, checkDeleted, lastKey, buff)
+      }
     }
 
     logger.info("Finished reading.")
 
-    //We can't shutdown the persistence manager until all of the Actors have completed their work
+    // We can't shutdown the persistence manager until all of the Actors have completed their work
     for(p <- pool) buff.put("exit")
     for(p <- pool)
       while (p.getState != Actor.State.Terminated)
@@ -153,20 +167,28 @@ object ProcessRecords extends Tool with IncrementalTool {
     logger.info("Finished writing.")
   }
 
-  def readFromDB( firstKey:Option[String], dr: Option[String],
-                  checkDeleted:Boolean=false, lastKey:Option[String]=None,
-                  buffer: LinkedBlockingQueue[Object]): Int = {
-    val endUuid = if (lastKey.isDefined) lastKey.get else if(dr.isEmpty) "" else dr.get +"|~"
+  def readFromDB(firstKey: Option[String], dr: Option[String], checkDeleted: Boolean = false,
+                 lastKey: Option[String] = None, buffer: LinkedBlockingQueue[Object]): Int = {
+
+    val endUuid = {
+      if(lastKey.isDefined) {
+        lastKey.get
+      } else if(dr.isEmpty) {
+        ""
+      } else {
+        dr.get + "|~"
+      }
+    }
 
     val startUuid = {
       if(!dr.isEmpty) {
-        dr.get +"|"
+        dr.get + "|"
       } else {
         firstKey.getOrElse("")
       }
     }
 
-    logger.info("Starting with " + startUuid +" ending with " + endUuid)
+    logger.info("Starting with " + startUuid + " ending with " + endUuid)
     val start = System.currentTimeMillis
     var startTime = System.currentTimeMillis
     var finishTime = System.currentTimeMillis
@@ -179,20 +201,24 @@ object ProcessRecords extends Tool with IncrementalTool {
     var batches = 0
 
     performPaging(rawAndProcessed => {
-      if(guid == "") logger.info("First rowKey processed: " + rawAndProcessed.get._1.rowKey)
+      if(guid == "") {
+        logger.info("First rowKey processed: " + rawAndProcessed.get._1.rowKey)
+      }
+
       guid = rawAndProcessed.get._1.rowKey
       count += 1
 
-      //we want to add the record to the buffer whether or not we send them to the actor
-      //add it to the buffer isnt a deleted record
+      // we want to add the record to the buffer whether or not we send them to the actor
+      // add it to the buffer isnt a deleted record
       if (!rawAndProcessed.isEmpty && !rawAndProcessed.get._1.deleted){
         buffer.put(rawAndProcessed.get)
       }
 
-      //debug counter
+      // debug counter
       if (count % 1000 == 0) {
         logger.info("records read: " + count)
       }
+
       true //indicate to continue
     }, startUuid, endUuid)
 
@@ -213,7 +239,7 @@ object ProcessRecords extends Tool with IncrementalTool {
         }
       }
 
-      if (count % 1000 == 0) {
+      if(count % 1000 == 0) {
         finishTime = System.currentTimeMillis
         logger.info("records read: " + count)
       }
@@ -222,7 +248,8 @@ object ProcessRecords extends Tool with IncrementalTool {
     count
   }
 
-  def performPaging(proc: (Option[(FullRecord, FullRecord)] => Boolean), startKey:String="", endKey:String="", pageSize: Int = 1000){
+  def performPaging(proc: (Option[(FullRecord, FullRecord)] => Boolean), startKey: String = "", endKey: String = "",
+                    pageSize: Int = 1000) {
     occurrenceDAO.pageOverRawProcessed(rawAndProcessed => {
       proc(rawAndProcessed)
     }, startKey, endKey, pageSize)
@@ -252,8 +279,8 @@ object Consumer {
   private var lastTime:AtomicLong = new AtomicLong(0)
 }
 
-class Consumer (master:Actor, val id:Int, val buffer:LinkedBlockingQueue[Object],
-                val writeBuffer: LinkedBlockingQueue[Object], val firstLoad:Boolean=false)  extends Actor  {
+class Consumer(master: Actor, val id: Int, val buffer: LinkedBlockingQueue[Object],
+               val writeBuffer: LinkedBlockingQueue[Object], val firstLoad: Boolean=false) extends Actor  {
 
   val logger = LoggerFactory.getLogger("Consumer")
 
@@ -281,7 +308,7 @@ class Consumer (master:Actor, val id:Int, val buffer:LinkedBlockingQueue[Object]
           }
 
           val c: Int = Consumer.count.addAndGet(1)
-          if (c % 1000 == 0) {
+          if(c % 1000 == 0) {
             val t: Long = Consumer.totalTime.get()
             logger.info("processed " + c + " records : last uuid " + raw.rowKey + " : "
                + (1000f / ((t - Consumer.lastTime.get()).toFloat / 60000f) ) + " records processed per minute")

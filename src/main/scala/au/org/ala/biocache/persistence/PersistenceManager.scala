@@ -21,7 +21,7 @@ trait PersistenceManager {
   /**
     * Get a single property.
     */
-  def get(uuid:String, entityName:String, propertyName:String) : Option[String]
+  def get(uuid: String, entityName:String, propertyName:String) : Option[String]
 
   /**
     * Gets the supplied properties for this record
@@ -115,5 +115,3 @@ trait PersistenceManager {
     */
   def fieldDelimiter = '.'
 }
-
-
