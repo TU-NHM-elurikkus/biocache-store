@@ -299,6 +299,7 @@ class Consumer(master: Actor, val id: Int, val buffer: LinkedBlockingQueue[Objec
           val (raw, processed) = rawAndProcessed
 
           val startTime = System.currentTimeMillis
+
           batches += processor.processRecord(raw, processed, firstLoad)
           Consumer.totalTime.addAndGet(System.currentTimeMillis() - startTime)
 

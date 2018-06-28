@@ -48,7 +48,7 @@ object FullRecordMapper {
     })
 
     //add the special cases to the map
-    if(fullRecord.miscProperties!=null && !fullRecord.miscProperties.isEmpty && version == Raw){
+    if(fullRecord.miscProperties!=null && version == Raw){
       properties.put(miscPropertiesColumn, Json.toJSON(fullRecord.miscProperties))        //store them as JSON array
     }
     if(fullRecord.firstLoaded != null && !fullRecord.firstLoaded.isEmpty && version == Raw){

@@ -371,18 +371,34 @@ trait DataLoader {
           } else if(mediaTypeLower == "image") {
             imagesBuffer += savedFilePathOrId
           }
-          // associatedMediaBuffer += media.get.metadata.map(_.productIterator.mkString(":")).mkString(";")
           associatedMediaBuffer += savedFilename
         }
         case None => logger.debug("Unable to save file: " + fileToStore)
       }
 
-      //add the references
-      fr.occurrence.associatedMedia = associatedMediaBuffer.toArray.mkString(" | ")
-      fr.occurrence.images = imagesBuffer.toArray
-      fr.occurrence.sounds = soundsBuffer.toArray
-      fr.occurrence.videos = videosBuffer.toArray
     }
+
+    // compare existing associatedMedia and new media paths delete those that are not included in new
+    if(!fr.occurrence.associatedMedia.isEmpty) {
+        val oldAssociatedMedia = fr.occurrence.associatedMedia.split(" | ")
+        val newMediaBuffer = soundsBuffer ++ videosBuffer ++ imagesBuffer
+
+        for(aMedia <- oldAssociatedMedia) {
+            val (stored, name, path) = Config.mediaStore.alreadyStored(fr.uuid, fr.attribution.dataResourceUid, aMedia)
+
+            if((stored == true) && (!newMediaBuffer.contains(path))) {
+                logger.info(s"Removing non-referred path: $path")
+                Config.mediaStore.delete(path)
+            }
+        }
+    }
+
+    //add the references
+    fr.occurrence.associatedMedia = associatedMediaBuffer.toArray.mkString(" | ")
+    fr.occurrence.images = imagesBuffer.toArray
+    fr.occurrence.sounds = soundsBuffer.toArray
+    fr.occurrence.videos = videosBuffer.toArray
+
     fr
   }
 

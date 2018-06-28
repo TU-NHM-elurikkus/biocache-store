@@ -60,7 +60,7 @@ class RecordProcessor {
    *
    * When it is a batch, the record to be updated is returned for batch commits with writeProcessBatch.
    *
-   * When it is a firstLoad, there will be no offline assertions 
+   * When it is a firstLoad, there will be no offline assertions
    */
   def processRecord(raw: FullRecord, currentProcessed: FullRecord, batch: Boolean = false, firstLoad: Boolean = false): Map[String, Object] = {
     try {
