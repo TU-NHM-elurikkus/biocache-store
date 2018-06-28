@@ -44,6 +44,9 @@ class TestMediaStore extends MediaStore {
     Some((extractFileName(urlToMedia), ""))
   }
 
+  def delete(filePath: String) : Unit = {
+  }
+
   override def loadMetadata(filePath: String): java.util.Map[String, String] = {
       val fileMeta = new java.util.HashMap[String, String]()
       return fileMeta;

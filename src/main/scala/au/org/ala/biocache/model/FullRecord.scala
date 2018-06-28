@@ -15,7 +15,7 @@ import au.org.ala.biocache.poso.{POSO, CompositePOSO}
 class FullRecord (
   @BeanProperty var rowKey:String,
   @BeanProperty var uuid:String,
-  @BeanProperty var occurrence:Occurrence,
+  @BeanProperty var occurrence: Occurrence,
   @BeanProperty var classification:Classification,
   @BeanProperty var location:Location,
   @BeanProperty var event:Event,
@@ -44,8 +44,8 @@ class FullRecord (
 
   def objectArray:Array[POSO] = Array(occurrence,classification,location,event,attribution,identification,measurement)
 
-  def this(rowKey:String, uuid:String) = this(rowKey,uuid,new Occurrence,new Classification,new Location,new Event,new Attribution,new Identification,
-      new Measurement)
+  def this(rowKey: String, uuid: String) = this(rowKey, uuid, new Occurrence, new Classification, new Location,
+                                                new Event, new Attribution, new Identification, new Measurement)
 
   def this() = this(null,null,new Occurrence,new Classification,new Location,new Event,new Attribution,new Identification,
       new Measurement)

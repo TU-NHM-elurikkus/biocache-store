@@ -15,7 +15,7 @@ import com.google.inject.name.Names
 import au.org.ala.biocache.dao._
 import au.org.ala.biocache.index.{SolrIndexDAO, IndexDAO}
 import au.org.ala.biocache.persistence._
-import au.org.ala.biocache.load.{RemoteMediaStore, LocalMediaStore}
+import au.org.ala.biocache.load.LocalMediaStore
 import scala.io.Source
 
 /**
@@ -47,13 +47,8 @@ object Config {
   val remoteMediaStoreUrl = configModule.properties.getProperty("media.store.url", "")
 
   val mediaStore = {
-    if(StringUtils.isBlank(remoteMediaStoreUrl)){
-      logger.debug("Using local media store")
-      LocalMediaStore
-    } else {
-      logger.debug("Using remote media store")
-      RemoteMediaStore
-    }
+    logger.debug("Using local media store")
+    LocalMediaStore
   }
 
   //name index
