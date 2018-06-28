@@ -48,7 +48,7 @@ object FullRecordMapper {
     })
 
     //add the special cases to the map
-    if(fullRecord.miscProperties!=null && version == Raw){
+    if(fullRecord.miscProperties!=null && !fullRecord.miscProperties.isEmpty && version == Raw) {
       properties.put(miscPropertiesColumn, Json.toJSON(fullRecord.miscProperties))        //store them as JSON array
     }
     if(fullRecord.firstLoaded != null && !fullRecord.firstLoaded.isEmpty && version == Raw){
@@ -105,14 +105,14 @@ object FullRecordMapper {
    * <li>Map of source names to target values</li>
    * </ol>
    */
-  def mapmapPropertiesToObject(poso:POSO, valueMap:scala.collection.Map[String,Object], targetMap:scala.collection.Map[String,String]){
+  def mapmapPropertiesToObject(poso: POSO, valueMap: scala.collection.Map[String, Object], targetMap: scala.collection.Map[String, String]) {
 
     valueMap.keys.foreach(sourceName => {
-      //get the target name
-      val targetName = targetMap.getOrElse(sourceName,"")
-      if(targetName != ""){
+      // get the target name
+      val targetName = targetMap.getOrElse(sourceName, "")
+      if(targetName != "") {
         val value = valueMap.get(sourceName)
-        //get the setter method
+        // get the setter method
         if(value.isDefined && value.get != null) {
           poso.setProperty(targetName, value.get.toString)
         }
@@ -138,8 +138,8 @@ object FullRecordMapper {
     val fullRecord = new FullRecord
     fullRecord.rowKey = rowKey
     fullRecord.uuid = fields.getOrElse("uuid", "")
-    fullRecord.lastModifiedTime = fields.getOrElse(markNameBasedOnVersion("lastModifiedTime",version),"")
-    fullRecord.firstLoaded = fields.getOrElse("firstLoaded","")
+    fullRecord.lastModifiedTime = fields.getOrElse(markNameBasedOnVersion("lastModifiedTime", version), "")
+    fullRecord.firstLoaded = fields.getOrElse("firstLoaded", "")
 
     fullRecord.setRawFieldsWithMapping(fields)
     fields.keySet.foreach( fieldName => {
