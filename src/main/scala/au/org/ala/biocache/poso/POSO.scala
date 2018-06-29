@@ -85,7 +85,7 @@ trait POSO {
         case "java.util.Date" => {
           def date = DateParser.parseStringToDate(value)
           if(date.isDefined)
-            property.setter.invoke(this, date.get)        
+            property.setter.invoke(this, date.get)
         }
         case _ => logger.warn("Unhandled data type: " + property.typeName + " Property: " + name  + " : " + value )
       }
@@ -152,75 +152,76 @@ trait POSO {
   def getPropertyNames: List[String] = lookup.values.map(v => v.name).toList
 
   def toMap: Map[String, String] = {
-    toMap(false)
+    toMap(true)
   }
 
   def toMap(includeEmpty:Boolean): Map[String, String] = {
-
     val map = new HashMap[String, String]
     lookup.values.foreach(property => {
 
       //println("************* POSO.toMap field name: " + property.name)
       val unparsed = property.getter.invoke(this)
 
-      if (unparsed != null) {
-        property.typeName match {
-          case "java.lang.String" => {
-            val value = unparsed.asInstanceOf[String]
-            if (value != null && (includeEmpty || value != "")) {
-              map.put(property.name, value)
+      property.typeName match {
+        case "java.lang.String" => {
+          var value = unparsed.asInstanceOf[String]
+          if (value == null) {
+            value = ""
+          }
+          if (includeEmpty || value != "") {
+            map.put(property.name, value)
+          }
+        }
+        case "[Ljava.lang.String;" => {
+          try {
+            val value = unparsed.asInstanceOf[Array[AnyRef]]
+            if (value != null && value.length > 0) {
+              val array = Json.toJSON(value)
+              map.put(property.name, array)
             }
+          } catch {
+            case e: Exception => logger.error(e.getMessage, e)
           }
-          case "[Ljava.lang.String;" => {
-            try {
-              val value = unparsed.asInstanceOf[Array[AnyRef]]
-              if (value.length > 0) {
-                val array = Json.toJSON(value)
-                map.put(property.name, array)
-              }
-            } catch {
-              case e: Exception => logger.error(e.getMessage, e)
-            }
+        }
+        case "int" => {
+          val value = unparsed.asInstanceOf[Int]
+          map.put(property.name, value.toString)
+        }
+        case "double" => {
+          val value = unparsed.asInstanceOf[Double]
+          map.put(property.name, value.toString)
+        }
+        case "boolean" => {
+          val value = unparsed.asInstanceOf[Boolean]
+          map.put(property.name, value.toString)
+        }
+        case "scala.collection.immutable.Map" => {
+          val value = unparsed.asInstanceOf[Map[String, String]]
+          if (value != null && !value.isEmpty) {
+            val stringValue = Json.toJSON(value)
+            map.put(property.name, stringValue)
           }
-          case "int" => {
-            val value = unparsed.asInstanceOf[Int]
-            map.put(property.name, value.toString)
+        }
+        case "java.util.Map" => {
+          //val value = unparsed.asInstanceOf[Map[String,String]]
+          val value = unparsed.asInstanceOf[java.util.Map[String, String]]
+          if (!value.isEmpty) {
+            val stringValue = Json.toJSON(value)
+            map.put(property.name, stringValue)
           }
-          case "double" => {
-            val value = unparsed.asInstanceOf[Double]
-            map.put(property.name, value.toString)
-          }
-          case "boolean" => {
-            val value = unparsed.asInstanceOf[Boolean]
-            map.put(property.name, value.toString)
-          }
-          case "scala.collection.immutable.Map" => {
-            val value = unparsed.asInstanceOf[Map[String, String]]
-            if (!value.isEmpty) {
-              val stringValue = Json.toJSON(value)
-              map.put(property.name, stringValue)
-            }
-          }
-          case "java.util.Map" => {
-            //val value = unparsed.asInstanceOf[Map[String,String]]
-            val value = unparsed.asInstanceOf[java.util.Map[String, String]]
-            if (!value.isEmpty) {
-              val stringValue = Json.toJSON(value)
-              map.put(property.name, stringValue)
-            }
-          }
-          case "java.util.Date" => {
-            map.put(property.name, unparsed.asInstanceOf[java.util.Date])
-          }
-          case _ => {
-            if (unparsed.isInstanceOf[POSO]) {
-              map ++ unparsed.asInstanceOf[POSO].toMap
-            } else {
-              throw new UnsupportedOperationException("Unsupported field type " + property.typeName)
-            }
+        }
+        case "java.util.Date" => {
+          map.put(property.name, unparsed.asInstanceOf[java.util.Date])
+        }
+        case _ => {
+          if (unparsed.isInstanceOf[POSO]) {
+            map ++ unparsed.asInstanceOf[POSO].toMap
+          } else {
+            throw new UnsupportedOperationException("Unsupported field type " + property.typeName)
           }
         }
       }
+
     })
     map.toMap
   }

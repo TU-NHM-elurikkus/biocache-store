@@ -260,9 +260,7 @@ class DwCALoader extends DataLoader {
         if (removeNullFields) {
           fieldTuples += (modelProperty -> property)
         } else {
-          if (StringUtils.isNotBlank(property)) {
-            fieldTuples += (modelProperty -> property)
-          }
+          fieldTuples += (modelProperty -> property)
         }
       })
 
