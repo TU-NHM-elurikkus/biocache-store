@@ -451,8 +451,12 @@ trait IndexDAO {
         val breeding = {
           if (basisOfRecord == "HumanObservation") {
             val dynamics = map.getOrElse("dynamicProperties", "{}")
-            val jsonMap = JSON.parseFull(dynamics).get.asInstanceOf[Map[String, String]]
-            jsonMap.getOrElse("breeding", "")
+            val jsonMap = JSON.parseFull(dynamics)
+            if (jsonMap.isDefined) {
+              jsonMap.get.asInstanceOf[Map[String, String]].getOrElse("breeding", "")
+            } else {
+              ""
+            }
           } else {
             ""
           }
