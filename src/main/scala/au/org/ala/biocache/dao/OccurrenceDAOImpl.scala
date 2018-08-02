@@ -507,15 +507,15 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     fullRecords.foreach(fr  => {
       //process the record
       val properties = FullRecordMapper.fullRecord2Map(fr, Versions.RAW)
-      if(removeNullFields) {
-        properties ++= fr.getRawFields().filter({ case (k, v) => {
-          !properties.isDefinedAt(k)
-        }
-        }).map({ case (k, v) => {
-          (k, null)
-        }
-        })
-      }
+      // if(removeNullFields) {
+      //   properties ++= fr.getRawFields().filter({ case (k, v) => {
+      //     !properties.isDefinedAt(k)
+      //   }
+      //   }).map({ case (k, v) => {
+      //     (k, null)
+      //   }
+      //   })
+      // }
       batch.put(fr.rowKey, properties.toMap)
     })
     //commit
