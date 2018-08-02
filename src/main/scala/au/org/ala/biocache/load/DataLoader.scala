@@ -42,7 +42,7 @@ trait DataLoader {
    * @return
    */
   def getDeletedFileWriter(resourceUid: String):java.io.FileWriter ={
-    val file =  new File(Config.deletedFileStore +File.separator + resourceUid+File.separator+"deleted.txt")
+    val file = new File(Config.deletedFileStore + File.separator + resourceUid + File.separator + "deleted.txt")
     FileUtils.forceMkdir(file.getParentFile)
     new java.io.FileWriter(file)
   }
@@ -379,7 +379,7 @@ trait DataLoader {
     }
 
     // compare existing associatedMedia and new media paths delete those that are not included in new
-    if(!fr.occurrence.associatedMedia.isEmpty) {
+    if(!fr.occurrence.associatedMedia == null && !fr.occurrence.associatedMedia.isEmpty) {
         val oldAssociatedMedia = fr.occurrence.associatedMedia.split(" | ")
         val newMediaBuffer = soundsBuffer ++ videosBuffer ++ imagesBuffer
 
