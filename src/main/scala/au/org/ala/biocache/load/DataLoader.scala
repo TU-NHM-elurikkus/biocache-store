@@ -379,7 +379,7 @@ trait DataLoader {
     }
 
     // compare existing associatedMedia and new media paths delete those that are not included in new
-    if(!fr.occurrence.associatedMedia == null && !fr.occurrence.associatedMedia.isEmpty) {
+    if((fr.occurrence.associatedMedia != null) && !fr.occurrence.associatedMedia.isEmpty) {
         val oldAssociatedMedia = fr.occurrence.associatedMedia.split(" | ")
         val newMediaBuffer = soundsBuffer ++ videosBuffer ++ imagesBuffer
 
