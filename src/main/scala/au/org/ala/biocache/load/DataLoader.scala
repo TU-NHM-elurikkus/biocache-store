@@ -305,17 +305,11 @@ trait DataLoader {
       suppliedMedia.forall(!_.endsWith(url))
     }
 
-    println("println(suppliedMedia)")
-    println(suppliedMedia)
-
     val filesToImport = filterURLs(associatedMedia, suppliedMedia)
 
     if (filesToImport.isEmpty) {
       return fr
     }
-
-    println("println(filesToImport)")
-    println(filesToImport)
 
     val fileNameToID = new mutable.HashMap[String, String]()
 
@@ -372,9 +366,9 @@ trait DataLoader {
         case Some((savedFilename, savedFilePathOrId)) => {
           if("audio,sound".contains(mediaTypeLower)) {  // Nick'll be proud
             soundsBuffer += savedFilePathOrId
-          } else if(mediaTypeLower == "video") {
+          } else if("movingimage,video".contains(mediaTypeLower)) {
             videosBuffer += savedFilePathOrId
-          } else if(mediaTypeLower == "image") {
+          } else if(mediaTypeLower.contains("image"))) {  // image must be last, so movingimage would match video
             imagesBuffer += savedFilePathOrId
           }
           associatedMediaBuffer += savedFilename
