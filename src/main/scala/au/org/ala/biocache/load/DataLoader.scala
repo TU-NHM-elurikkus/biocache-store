@@ -305,11 +305,17 @@ trait DataLoader {
       suppliedMedia.forall(!_.endsWith(url))
     }
 
+    println("println(suppliedMedia)")
+    println(suppliedMedia)
+
     val filesToImport = filterURLs(associatedMedia, suppliedMedia)
 
     if (filesToImport.isEmpty) {
       return fr
     }
+
+    println("println(filesToImport)")
+    println(filesToImport)
 
     val fileNameToID = new mutable.HashMap[String, String]()
 
