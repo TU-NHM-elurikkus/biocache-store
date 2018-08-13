@@ -368,7 +368,7 @@ trait DataLoader {
             soundsBuffer += savedFilePathOrId
           } else if("movingimage,video".contains(mediaTypeLower)) {
             videosBuffer += savedFilePathOrId
-          } else if(mediaTypeLower.contains("image"))) {  // image must be last, so movingimage would match video
+          } else if(mediaTypeLower.contains("image")) {  // image must be last, so movingimage would match video
             imagesBuffer += savedFilePathOrId
           }
           associatedMediaBuffer += savedFilename
