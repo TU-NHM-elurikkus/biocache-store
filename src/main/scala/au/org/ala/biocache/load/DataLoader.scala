@@ -366,7 +366,7 @@ trait DataLoader {
         case Some((savedFilename, savedFilePathOrId)) => {
           if("audio,sound".contains(mediaTypeLower)) {  // Nick'll be proud
             soundsBuffer += savedFilePathOrId
-          } else if("movingimage,video".contains(mediaTypeLower)) {
+        } else if(mediaTypeLower == "movingimage" || mediaTypeLower == "video") {
             videosBuffer += savedFilePathOrId
           } else if(mediaTypeLower.contains("image")) {  // image must be last, so movingimage would match video
             imagesBuffer += savedFilePathOrId
