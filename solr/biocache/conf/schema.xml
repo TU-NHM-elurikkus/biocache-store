@@ -489,7 +489,7 @@
         <field name="occurrence_id" type="string" stored="true" multiValued="false" />
         <field name="data_hub_uid" type="string" indexed="true" stored="true" multiValued="true" />
         <field name="data_hub" type="string" indexed="true" stored="true" multiValued="true" />
-        <field name="individual_count" type="string" indexed="false" stored="true" multiValued="false" />
+        <field name="individual_count" type="int" indexed="true" stored="true" multiValued="false" />
 
         <field name="data_provider_uid" type="string" indexed="true" stored="true" multiValued="false" />
         <field name="data_provider" type="string" indexed="true" stored="true" multiValued="false" />
