@@ -26,7 +26,7 @@ object CollectorNameParser {
   val COLLECTOR_DELIM = ";|\"\"|\\|| - ".r;
   val COMMA_LIST = ",|&".r
   val suffixes = "jr|Jr|JR"
-  val AND_NAME_LISTPattern = ("((?:[A-Z][. ] ?){0,3})([" + NAME_LETTERS + "][\\p{Ll}-']*)? ?([" + NAME_LETTERS + "][\\p{Ll}\\p{Lu}'-]*)? ?" + "(?:" + AND + ") ?((?:[A-Z][. ] ?){0,3})([" + NAME_LETTERS + "][\\p{Ll}'-]*)? ?([" + NAME_LETTERS + "][\\p{Ll}\\p{Lu}'-]*)?").r
+  val AND_NAME_LISTPattern = ("((?:[A-Z][. ] ?){0,3})([" + NAME_LETTERS + "][\\p{Ll}-']*)? ?([" + NAME_LETTERS + "][\\p{Ll}\\p{Lu}'-]*)? ?" + "\\b(?:" + AND + ")\\b ?((?:[A-Z][. ] ?){0,3})([" + NAME_LETTERS + "][\\p{Ll}'-]*)? ?([" + NAME_LETTERS + "][\\p{Ll}\\p{Lu}'-]*)?").r
   val FirstnameSurnamePattern = ("([" + NAME_LETTERS + "][\\p{Ll}']*) ((?:[A-Z][. ] ?){0,4}) ?([\\p{Lu}\\p{Ll}'-]*)? ?(?:" + na + ")?").r
   //"(["+NAME_LETTERS +"][" + name_letters + "?]{1,}" + " ) (["+NAME_LETTERS +"][" + name_letters + "?]{1,}" + " )"
   val unknown = List("\"?ANON  N/A\"?", "\"NOT ENTERED[ ]*-[ ]*SEE ORIGINAL DATA[ ]*-[ ]*\"", "\\[unknown\\]", "Anon.", "No data", "Unknown", "Anonymous", "\\?")
