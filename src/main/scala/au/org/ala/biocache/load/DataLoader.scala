@@ -50,14 +50,14 @@ trait DataLoader {
   def deleteOldRowKeys(resourceUid:String){
     //delete the row key file so that it only exists if the load is configured to
     //thus processing and indexing of the data resource should check to see if a file exists first
-    FileUtils.deleteQuietly(new File(Config.tmpWorkDir + "/row_key_"+resourceUid+".csv"))
+    FileUtils.deleteQuietly(new File(Config.tmpWorkDir + "/row_key_" + resourceUid + ".csv"))
   }
 
   def getRowKeyWriter(resourceUid:String, writeRowKeys:Boolean):Option[java.io.Writer]={
     if(writeRowKeys){
       FileUtils.forceMkdir(new File(Config.tmpWorkDir))
-      //the file is deleted first so we set it up to append.  allows resources with multiple files to have row keys recorded
-      Some(new java.io.FileWriter(Config.tmpWorkDir + "/row_key_"+resourceUid+".csv", true))
+      //the file is deleted first so we set it up to append. allows resources with multiple files to have row keys recorded
+      Some(new java.io.FileWriter(Config.tmpWorkDir + "/row_key_" + resourceUid + ".csv", true))
     } else {
       None
     }
@@ -458,14 +458,14 @@ trait DataLoader {
           val f = new File(temporaryFileStore + resourceUid + ".zip")
           f.createNewFile()
           (f,null, true, false,false)
-        } else if (url.endsWith(".gz")){
-          val f = new File(temporaryFileStore + resourceUid + File.separator + resourceUid +".gz")
+        } else if (url.endsWith(".gz")) {
+          val f = new File(temporaryFileStore + resourceUid + File.separator + resourceUid + ".gz")
           logger.info("  creating file: " + f.getAbsolutePath)
           FileUtils.forceMkdir(f.getParentFile())
           f.createNewFile()
           (f,null, false, true,false)
         } else if (filename.contains(".")) {
-          val f = new File(temporaryFileStore + resourceUid + File.separator + resourceUid +".csv")
+          val f = new File(temporaryFileStore + resourceUid + File.separator + resourceUid + ".csv")
           logger.info("  creating file: " + f.getAbsolutePath)
           FileUtils.forceMkdir(f.getParentFile())
           f.createNewFile()
@@ -532,10 +532,10 @@ trait DataLoader {
       FileUtils.forceMkdir(tmpStore)
     }
 
-    logger.info("Downloading zip file from "+ url)
+    logger.info("Downloading zip file from " + url)
     val urlConnection = new java.net.URL(url.replaceAll(" " ,"%20")).openConnection()
     val date = if(urlConnection.getLastModified() == 0) new Date() else new Date(urlConnection.getLastModified())
-    //logger.info("URL Last Modified: " +urlConnection.getLastModified())
+    //logger.info("URL Last Modified: " + urlConnection.getLastModified())
     if(afterDate.isEmpty || urlConnection.getLastModified() == 0 || afterDate.get.getTime() < urlConnection.getLastModified()){
       //handle the situation where the files name is not supplied in the URL but in the Content-Disposition
       val contentDisp = urlConnection.getHeaderField("Content-Disposition")
@@ -550,13 +550,13 @@ trait DataLoader {
           f.createNewFile()
           (f, true, false)
         } else if (url.endsWith(".gz") || (contentDisp != null && contentDisp.endsWith(""".gz""""))){
-          val f = new File(temporaryFileStore  + File.separatorChar + resourceUid + File.separator + resourceUid +".gz")
+          val f = new File(temporaryFileStore + File.separatorChar + resourceUid + File.separator + resourceUid + ".gz")
           logger.info("Creating file: " + f.getAbsolutePath)
           FileUtils.forceMkdir(f.getParentFile())
           f.createNewFile()
           (f, false, true)
         } else {
-          val f = new File(temporaryFileStore + File.separatorChar + resourceUid + File.separator + resourceUid +".csv")
+          val f = new File(temporaryFileStore + File.separatorChar + resourceUid + File.separator + resourceUid + ".csv")
           logger.info("Creating file: " + f.getAbsolutePath)
           FileUtils.forceMkdir(f.getParentFile())
           f.createNewFile()
@@ -575,10 +575,10 @@ trait DataLoader {
       out.flush
       in.close
       out.close
-      logger.info("Downloaded. File size: ", counter / 1024 +"kB, " + file.getAbsolutePath +", is zipped: " + isZipped+"\n")
+      logger.info("Downloaded. File size: ", counter / 1024 + "kB, " + file.getAbsolutePath + ", is zipped: " + isZipped + "\n")
       (file,date,isZipped,isGzipped)
     } else {
-      logger.info("The file has not changed since the last time it  was loaded. " +
+      logger.info("The file has not changed since the last time it was loaded. " +
         "To load the data a force-load will need to be performed")
       (null,null,false,false)
     }
@@ -592,14 +592,14 @@ trait DataLoader {
       //set the last check time for the supplied resourceUid only if configured to allow updates
       if(Config.allowCollectoryUpdates == "true"){
 
-        val map = new  scala.collection.mutable.HashMap[String,String]()
+        val map = new scala.collection.mutable.HashMap[String,String]()
         map ++= Map("user"-> user, "api_key"-> Config.collectoryApiKey, "lastChecked" -> loadTime)
 
         if(dataCurrency.isDefined) {
           map += ("dataCurrency" -> dataCurrency.get)
         }
         //turn the map of values into JSON representation
-        val data = map.map(pair => "\""+pair._1 +"\":\"" +pair._2 +"\"").mkString("{",",", "}")
+        val data = map.map(pair => "\"" + pair._1 + "\":\"" + pair._2 + "\"").mkString("{",",", "}")
 
         val (responseCode, responseBody) = HttpUtil.postBody(Config.registryUrl + "/dataResource/" + resourceUid, "application/json", data)
 
