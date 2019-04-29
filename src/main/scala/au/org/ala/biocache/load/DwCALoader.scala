@@ -302,9 +302,17 @@ class DwCALoader extends DataLoader {
         rowKeyWriter.get.write(rowKey + "\n")
       }
 
-      if(!testFile){
-        val fullRecord = FullRecordMapper.createFullRecord(rowKey, fieldTuples.toArray, Raw)
-        processMedia(resourceUid, fullRecord, multimedia)
+      if(!testFile) {
+        // We need to to query for old Media data before loading in the new record values
+        val oldFullRecord = Config.occurrenceDAO.getByUuid(recordUuid, Raw).getOrElse(null)
+        var oldMedia = ""
+        if(oldFullRecord != null) {
+          oldMedia = oldFullRecord.occurrence.associatedMedia
+        }
+
+        var fullRecord = FullRecordMapper.createFullRecord(rowKey, fieldTuples.toArray, Raw)
+        fullRecord = processMedia(resourceUid, fullRecord, multimedia, oldMedia)
+        logger.info(fullRecord.occurrence.associatedMedia)
         currentBatch += fullRecord
       }
 
