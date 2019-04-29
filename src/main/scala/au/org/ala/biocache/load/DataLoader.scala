@@ -296,8 +296,7 @@ trait DataLoader {
    * @param fr
    * @param multimedia An optional list of multimedia information derived from other sources
    */
-  def processMedia(dataResourceUid: String, fr: FullRecord, multimedia: Seq[Multimedia] = Seq.empty[Multimedia]) : FullRecord = {
-
+  def processMedia(dataResourceUid: String, fr: FullRecord, multimedia: Seq[Multimedia] = Seq.empty[Multimedia], oldMedia: String = null) : FullRecord = {
     // download the media - checking if it exists already
     // supplied media comes from a separate source. If it's also listed in the associatedMedia then don't double-load it
     val suppliedMedia = multimedia map { media => media.location.toString }
@@ -306,10 +305,6 @@ trait DataLoader {
     }
 
     val filesToImport = filterURLs(associatedMedia, suppliedMedia)
-
-    if (filesToImport.isEmpty) {
-      return fr
-    }
 
     val fileNameToID = new mutable.HashMap[String, String]()
 
@@ -366,7 +361,7 @@ trait DataLoader {
         case Some((savedFilename, savedFilePathOrId)) => {
           if("audio,sound".contains(mediaTypeLower)) {  // Nick'll be proud
             soundsBuffer += savedFilePathOrId
-        } else if(List("movingimage", "video").contains(mediaTypeLower)) {
+          } else if(List("movingimage", "video").contains(mediaTypeLower)) {
             videosBuffer += savedFilePathOrId
           } else if(mediaTypeLower.contains("image")) {  // image must be last, so movingimage would match video
             imagesBuffer += savedFilePathOrId
@@ -379,18 +374,18 @@ trait DataLoader {
     }
 
     // compare existing associatedMedia and new media paths delete those that are not included in new
-    if((fr.occurrence.associatedMedia != null) && !fr.occurrence.associatedMedia.isEmpty) {
-        val oldAssociatedMedia = fr.occurrence.associatedMedia.split(" | ")
-        val newMediaBuffer = soundsBuffer ++ videosBuffer ++ imagesBuffer
+    if((oldMedia != null) && !oldMedia.isEmpty) {
+      val oldAssociatedMedia = oldMedia.split(" | ")
+      val newMediaBuffer = soundsBuffer ++ videosBuffer ++ imagesBuffer
 
-        for(aMedia <- oldAssociatedMedia) {
-            val (stored, name, path) = Config.mediaStore.alreadyStored(fr.uuid, fr.attribution.dataResourceUid, aMedia)
+      for(aMedia <- oldAssociatedMedia) {
+        val (stored, name, path) = Config.mediaStore.alreadyStored(fr.uuid, fr.attribution.dataResourceUid, aMedia)
 
-            if((stored == true) && (!newMediaBuffer.contains(path))) {
-                logger.info(s"Removing non-referred path: $path")
-                Config.mediaStore.delete(path)
-            }
+        if((stored == true) && (!newMediaBuffer.contains(path))) {
+            logger.info(s"Removing non-referred path: $path")
+            Config.mediaStore.delete(path)
         }
+      }
     }
 
     //add the references
@@ -399,7 +394,7 @@ trait DataLoader {
     fr.occurrence.sounds = soundsBuffer.toArray
     fr.occurrence.videos = videosBuffer.toArray
 
-    fr
+    return fr
   }
 
   /**
