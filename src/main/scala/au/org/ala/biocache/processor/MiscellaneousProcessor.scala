@@ -2,6 +2,7 @@ package au.org.ala.biocache.processor
 
 import scala.collection.mutable.ArrayBuffer
 import org.apache.commons.lang.StringUtils
+
 import au.org.ala.biocache.model.{QualityAssertion, FullRecord}
 import au.org.ala.biocache.vocab._
 import au.org.ala.biocache.parser.CollectorNameParser
@@ -180,9 +181,20 @@ class MiscellaneousProcessor extends Processor {
      * validates that the associated media is a valid image url
      */
     def processImages(guid: String, raw: FullRecord, processed: FullRecord, assertions: ArrayBuffer[QualityAssertion]) = {
-        processed.occurrence.images = raw.occurrence.images
-        processed.occurrence.sounds = raw.occurrence.sounds
-        processed.occurrence.videos = raw.occurrence.videos
+        val media = raw.occurrence.associatedMedia
+
+        if((media == null) || (media == "")) {
+          // XXX  We don't like thist but what you gonna do eh?
+          // For some reason, removing the last image from occurrence doesn't remove the image reference URL. Not sure
+          // why but this is the only way I found how to override this
+          processed.occurrence.images = Array()
+          processed.occurrence.sounds = Array()
+          processed.occurrence.videos = Array()
+        } else {
+          processed.occurrence.images = raw.occurrence.images
+          processed.occurrence.sounds = raw.occurrence.sounds
+          processed.occurrence.videos = raw.occurrence.videos
+      }
     }
 
     def getName = "image"

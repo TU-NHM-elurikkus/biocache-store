@@ -48,26 +48,26 @@ object FullRecordMapper {
     })
 
     //add the special cases to the map
-    if(fullRecord.miscProperties!=null && !fullRecord.miscProperties.isEmpty && version == Raw) {
+    if(fullRecord.miscProperties != null && !fullRecord.miscProperties.isEmpty && version == Raw) {
       properties.put(miscPropertiesColumn, Json.toJSON(fullRecord.miscProperties))        //store them as JSON array
     }
-    if(fullRecord.firstLoaded != null && !fullRecord.firstLoaded.isEmpty && version == Raw){
+    if(fullRecord.firstLoaded != null && !fullRecord.firstLoaded.isEmpty && version == Raw) {
       properties.put("firstLoaded", fullRecord.firstLoaded)
     }
-    if(fullRecord.dateDeleted != null && !fullRecord.dateDeleted.isEmpty && version == Raw){
+    if(fullRecord.dateDeleted != null && !fullRecord.dateDeleted.isEmpty && version == Raw) {
       properties.put(dateDeletedColumn, fullRecord.firstLoaded)
     }
-    if(fullRecord.el != null && !fullRecord.el.isEmpty && version == Processed){
+    if(fullRecord.el != null && !fullRecord.el.isEmpty && version == Processed) {
       properties.put(environmentalLayersColumn, Json.toJSON(fullRecord.el))        //store them as JSON array
     }
-    if(fullRecord.cl != null && !fullRecord.cl.isEmpty && version == Processed){
+    if(fullRecord.cl != null && !fullRecord.cl.isEmpty && version == Processed) {
       properties.put(contextualLayersColumn, Json.toJSON(fullRecord.cl))        //store them as JSON array
     }
     properties.put("uuid", fullRecord.uuid)
     properties.put("rowKey", fullRecord.rowKey)
     properties.put(FullRecordMapper.defaultValuesColumn, fullRecord.defaultValuesUsed.toString)
     properties.put(FullRecordMapper.locationDeterminedColumn, fullRecord.locationDetermined.toString)
-    if(fullRecord.lastModifiedTime != ""){
+    if(fullRecord.lastModifiedTime != "") {
       properties.put(FullRecordMapper.markNameBasedOnVersion(FullRecordMapper.alaModifiedColumn, version), fullRecord.lastModifiedTime)
     }
     properties

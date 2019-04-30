@@ -312,7 +312,6 @@ class DwCALoader extends DataLoader {
 
         var fullRecord = FullRecordMapper.createFullRecord(rowKey, fieldTuples.toArray, Raw)
         fullRecord = processMedia(resourceUid, fullRecord, multimedia, oldMedia)
-        logger.info(fullRecord.occurrence.associatedMedia)
         currentBatch += fullRecord
       }
 
