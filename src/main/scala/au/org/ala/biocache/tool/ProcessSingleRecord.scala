@@ -4,7 +4,7 @@ import java.io.{InputStreamReader, BufferedReader}
 import org.codehaus.jackson.map.ObjectMapper
 import org.slf4j.LoggerFactory
 import au.org.ala.biocache.Config
-import au.org.ala.biocache.model.{Processed, Versions}
+import au.org.ala.biocache.model.Processed
 import au.org.ala.biocache.util.OptionParser
 import au.org.ala.biocache.cmd.Tool
 import au.org.ala.biocache.processor.RecordProcessor
@@ -45,6 +45,7 @@ object ProcessSingleRecord extends Tool {
       processor.processRecord(records.get(0))
       val processedRecord = Config.occurrenceDAO.getByRowKey(records.get(1).rowKey, Processed)
       val objectMapper = new ObjectMapper
+
       if (!processedRecord.isEmpty)
         logger.info(objectMapper.writeValueAsString(processedRecord.get))
       else

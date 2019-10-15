@@ -1,11 +1,13 @@
 package au.org.ala.biocache.processor
 
 import scala.collection.mutable.ArrayBuffer
-import org.apache.commons.lang.StringUtils
 
-import au.org.ala.biocache.model.{QualityAssertion, FullRecord}
-import au.org.ala.biocache.vocab._
+import org.apache.commons.lang.StringUtils
+import org.slf4j.LoggerFactory
+
+import au.org.ala.biocache.model.{FullRecord, QualityAssertion}
 import au.org.ala.biocache.parser.CollectorNameParser
+import au.org.ala.biocache.vocab._
 
 /**
  * A processor of miscellaneous information.
@@ -16,6 +18,8 @@ class MiscellaneousProcessor extends Processor {
     val interactionPattern = """([A-Za-z]*):([\x00-\x7F\s]*)""".r
     import AssertionCodes._
     import AssertionStatus._
+
+    val logger = LoggerFactory.getLogger("MiscellaneousProcessor")
 
     def process(guid: String, raw: FullRecord, processed: FullRecord, lastProcessed: Option[FullRecord]=None): Array[QualityAssertion] = {
         val assertions = new ArrayBuffer[QualityAssertion]
@@ -183,11 +187,11 @@ class MiscellaneousProcessor extends Processor {
     def processImages(guid: String, raw: FullRecord, processed: FullRecord, assertions: ArrayBuffer[QualityAssertion]) = {
       val media = raw.occurrence.associatedMedia
 
-      println(s"BEFORE processimage: $raw.occurrence.uuid")
-      println(media)
+      logger.info(s"BEFORE processimage: $raw.occurrence.uuid")
+      logger.info(media)
 
       if((media == null) || (media == "")) {
-        println("Set images to empty")
+        logger.info("Set images to empty")
         // XXX  We don't like thist but what you gonna do eh?
         // For some reason, removing the last image from occurrence doesn't remove the image reference URL. Not sure
         // why but this is the only way I found how to override this
