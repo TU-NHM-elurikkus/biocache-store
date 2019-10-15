@@ -357,8 +357,9 @@ trait DataLoader {
       val savedTo = Config.mediaStore.save(fr.uuid, fr.attribution.dataResourceUid, fileToStore, media)
 
       val mediaTypeLower = media.get.metadata.getOrElse("type", "Other").toLowerCase
+
       savedTo match {
-        case Some((savedFilename, savedFilePathOrId)) => {
+        case Some((savedFilename, savedFilePathOrId)) =>
           if(List("audio", "sound").contains(mediaTypeLower)) {
             soundsBuffer += savedFilePathOrId
           } else if(List("movingimage", "video").contains(mediaTypeLower)) {
@@ -367,13 +368,13 @@ trait DataLoader {
             imagesBuffer += savedFilePathOrId
           }
           associatedMediaBuffer += savedFilename
-        }
+
         case None => logger.debug("Unable to save file: " + fileToStore)
       }
 
     }
 
-    // compare existing associatedMedia and new media paths delete those that are not included in new
+    // compare existing associatedMedia and new media paths. Delete those that are not included in new
     if((oldMedia != null) && !oldMedia.isEmpty) {
       val oldAssociatedMedia = oldMedia.split(" | ")
       val newMediaBuffer = soundsBuffer ++ videosBuffer ++ imagesBuffer
