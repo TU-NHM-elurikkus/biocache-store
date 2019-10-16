@@ -2,25 +2,22 @@ package au.org.ala.biocache.dao
 
 import java.io.OutputStream
 import java.util.Date
+import scala.collection.JavaConversions
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+
+import com.google.inject.Inject
+import org.apache.commons.lang.StringUtils
+import org.slf4j.LoggerFactory
 
 import au.org.ala.biocache._
 import au.org.ala.biocache.index.{IndexDAO, IndexFields}
 import au.org.ala.biocache.load.{DownloadMedia, FullRecordMapper}
 import au.org.ala.biocache.model._
 import au.org.ala.biocache.persistence.PersistenceManager
-import au.org.ala.biocache.vocab.{AssertionStatus}
-import au.org.ala.biocache.vocab.{AssertionCodes}
-import au.org.ala.biocache.vocab.ErrorCode
-import au.org.ala.biocache.util.{BiocacheConversions, Json}
 import au.org.ala.biocache.processor.Processors
 import au.org.ala.biocache.util.{BiocacheConversions, Json}
-import au.org.ala.biocache.vocab.{AssertionCodes, ErrorCode}
-import com.google.inject.Inject
-import org.apache.commons.lang.StringUtils
-import org.slf4j.LoggerFactory
+import au.org.ala.biocache.vocab.{AssertionCodes, AssertionStatus, ErrorCode}
 
-import scala.collection.JavaConversions
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
   * A DAO for accessing occurrences.
@@ -507,6 +504,12 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     fullRecords.foreach(fr  => {
       //process the record
       val properties = FullRecordMapper.fullRecord2Map(fr, Versions.RAW)
+
+      // XXX - Don't know why it's needed but sometimes resyncing doesn't remove old image links
+      if(properties.getOrElse("associatedMedia", null) == "") {
+        properties += ("images" -> null)
+      }
+
       // if(removeNullFields) {
       //   properties ++= fr.getRawFields().filter({ case (k, v) => {
       //     !properties.isDefinedAt(k)
@@ -581,24 +584,12 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     val oldproperties = FullRecordMapper.fullRecord2Map(oldRecord, version)
     val properties = FullRecordMapper.fullRecord2Map(newRecord, version)
 
-    //only write changes.........
-    var propertiesToPersist = properties.filter({
-      case (key, value) => {
-        if (oldproperties.contains(key)) {
-          val oldValue = oldproperties.get(key).get
-          oldValue != value
-        } else {
-          true
-        }
-      }
-    })
-
     //check for deleted properties
     val deletedProperties = oldproperties.filter({
       case (key, value) => !properties.contains(key)
     })
 
-    propertiesToPersist ++= deletedProperties.map({
+    properties ++= deletedProperties.map({
       case (key, value) => key -> ""
     })
 
@@ -607,17 +598,15 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
     if(!assertions.isEmpty){
       initAssertions(newRecord, assertions.get)
       //only add  the assertions if they are different OR the properties to persist contain more than the last modified time stamp
-      if((oldRecord.assertions.toSet != newRecord.assertions.toSet) || !(propertiesToPersist.size == 1 && propertiesToPersist.getOrElse(timeCol, "") != "")){
+      if((oldRecord.assertions.toSet != newRecord.assertions.toSet) || !(properties.size == 1 && properties.getOrElse(timeCol, "") != "")){
         //only add the assertions if they have changed since the last time or the number of records to persist >1
-        propertiesToPersist ++= convertAssertionsToMap(rowKey,assertions.get)
+        properties ++= convertAssertionsToMap(rowKey,assertions.get)
         updateSystemAssertions(rowKey, assertions.get)
       }
     }
 
     //commit to cassandra if changes exist - changes exist if the properties to persist contain more info than the lastModifedTime
-    if(!propertiesToPersist.isEmpty && !(propertiesToPersist.size == 1 && propertiesToPersist.getOrElse(timeCol, "") != "")){
-      persistenceManager.put(rowKey, entityName, propertiesToPersist.toMap, false)
-    }
+    persistenceManager.put(rowKey, entityName, properties.toMap, false)
   }
 
   /**
@@ -638,24 +627,12 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
       val oldproperties = FullRecordMapper.fullRecord2Map(oldRecord, version)
       val properties = FullRecordMapper.fullRecord2Map(newRecord, version)
 
-      //only write changes.........
-      var propertiesToPersist = properties.filter({
-        case (key, value) => {
-          if (oldproperties.contains(key)) {
-            val oldValue = oldproperties.get(key).get
-            oldValue != value
-          } else {
-            true
-          }
-        }
-      })
-
       //check for deleted properties
       val deletedProperties = oldproperties.filter({
         case (key, value) => !properties.contains(key)
       })
 
-      propertiesToPersist ++= deletedProperties.map({
+      properties ++= deletedProperties.map({
         case (key, value) => key -> ""
       })
 
@@ -664,17 +641,15 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
       if (!assertions.isEmpty) {
         initAssertions(newRecord, assertions.get)
         //only add  the assertions if they are different OR the properties to persist contain more than the last modified time stamp
-        if ((oldRecord.assertions.toSet != newRecord.assertions.toSet) || !(propertiesToPersist.size == 1 && propertiesToPersist.getOrElse(timeCol, "") != "")) {
+        if ((oldRecord.assertions.toSet != newRecord.assertions.toSet) || !(properties.size == 1 && properties.getOrElse(timeCol, "") != "")) {
           //only add the assertions if they have changed since the last time or the number of records to persist >1
-          propertiesToPersist ++= convertAssertionsToMap(rowKey, assertions.get)
+          properties ++= convertAssertionsToMap(rowKey, assertions.get)
           updateSystemAssertions(rowKey, assertions.get)
         }
       }
 
       //commit to cassandra if changes exist - changes exist if the properties to persist contain more info than the lastModifedTime
-      if (!propertiesToPersist.isEmpty && !(propertiesToPersist.size == 1 && propertiesToPersist.getOrElse(timeCol, "") != "")) {
-        all.put(rowKey, propertiesToPersist.toMap)
-      }
+      all.put(rowKey, properties.toMap)
     }
 
     if (!all.isEmpty) {
