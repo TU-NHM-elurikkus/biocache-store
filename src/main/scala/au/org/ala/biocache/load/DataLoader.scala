@@ -3,18 +3,17 @@ package au.org.ala.biocache.load
 import java.io.{File, FileOutputStream, Writer}
 import java.net.URL
 import java.util.Date
-
-import org.apache.commons.io.{FileUtils, FilenameUtils}
-import org.slf4j.LoggerFactory
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.parsing.json.JSON
+
+import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.gbif.dwc.terms.TermFactory
+import org.slf4j.LoggerFactory
 
 import au.org.ala.biocache.Config
 import au.org.ala.biocache.parser.DateParser
 import au.org.ala.biocache.model.{FullRecord, Multimedia}
 import au.org.ala.biocache.util.{BiocacheConversions, FileHelper, HttpUtil, SFTPTools}
-import org.gbif.dwc.terms.TermFactory
 
 
 /**
@@ -305,8 +304,6 @@ trait DataLoader {
     }
 
     val filesToImport = filterURLs(associatedMedia, suppliedMedia)
-
-    val fileNameToID = new mutable.HashMap[String, String]()
 
     val associatedMediaBuffer = new ArrayBuffer[String]
     val imagesBuffer = new ArrayBuffer[String]
