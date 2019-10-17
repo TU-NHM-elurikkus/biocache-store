@@ -507,7 +507,7 @@ class OccurrenceDAOImpl extends OccurrenceDAO {
 
       // XXX - Don't know why it's needed but sometimes resyncing doesn't remove old image links
       if(properties.getOrElse("associatedMedia", null) == "") {
-        properties += ("images" -> null)
+        properties.put("images", "")
       }
 
       // if(removeNullFields) {
