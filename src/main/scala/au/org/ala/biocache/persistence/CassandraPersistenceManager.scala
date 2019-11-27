@@ -20,8 +20,8 @@ import scala.Some
   * Major change: The thrift API now works with ByteBuffer instead of byte[]
   */
 class CassandraPersistenceManager @Inject() (
-                                              @Named("cassandra.hosts") val host: String = "localhost",
-                                              @Named("cassandra.port") val port:Int = 9160,
+                                              @Named("cassandra.hosts") val host: String = "172.17.66.37",
+                                              @Named("cassandra.port") val port:Int = 9042,
                                               @Named("cassandra.pool") val poolName:String = "biocache-store-pool",
                                               @Named("cassandra.keyspace") val keyspace:String = "occ",
                                               @Named("cassandra.max.connections")val maxConnections:Int= -1,
