@@ -309,6 +309,7 @@ trait DataLoader {
     val imagesBuffer = new ArrayBuffer[String]
     val soundsBuffer = new ArrayBuffer[String]
     val videosBuffer = new ArrayBuffer[String]
+    val newMediaBuffer = new ArrayBuffer[String]
 
     filesToImport.foreach { fileToStore =>
 
@@ -352,8 +353,8 @@ trait DataLoader {
 
       // save() checks to see if the media has already been stored
       val savedTo = Config.mediaStore.save(fr.uuid, fr.attribution.dataResourceUid, fileToStore, media)
-
       val mediaTypeLower = media.get.metadata.getOrElse("type", "Other").toLowerCase
+
       savedTo match {
         case Some((savedFilename, savedFilePathOrId)) => {
           if(List("audio", "sound").contains(mediaTypeLower)) {
@@ -364,6 +365,7 @@ trait DataLoader {
             imagesBuffer += savedFilePathOrId
           }
           associatedMediaBuffer += savedFilename
+          newMediaBuffer += savedFilePathOrId
         }
         case None => logger.debug("Unable to save file: " + fileToStore)
       }
@@ -373,12 +375,11 @@ trait DataLoader {
     // compare existing associatedMedia and new media paths delete those that are not included in new
     if((oldMedia != null) && !oldMedia.isEmpty) {
       val oldAssociatedMedia = oldMedia.split(" | ")
-      val newMediaBuffer = soundsBuffer ++ videosBuffer ++ imagesBuffer
 
       for(aMedia <- oldAssociatedMedia) {
         val (stored, name, path) = Config.mediaStore.alreadyStored(fr.uuid, fr.attribution.dataResourceUid, aMedia)
 
-        if((stored == true) && (!newMediaBuffer.contains(path))) {
+        if(stored && (!newMediaBuffer.contains(path))) {
             logger.info(s"Removing non-referred path: $path")
             Config.mediaStore.delete(path)
         }
