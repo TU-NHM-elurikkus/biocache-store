@@ -1,9 +1,11 @@
 package au.org.ala.biocache.caches
 
-import au.org.ala.biocache.Config
-import au.org.ala.names.model.{NameSearchResult, MetricsResultDTO, LinnaeanRankClassification}
-import au.org.ala.biocache.model.Classification
 import org.slf4j.LoggerFactory
+
+import au.org.ala.biocache.Config
+import au.org.ala.biocache.model.Classification
+import au.org.ala.names.model.{NameSearchResult, MetricsResultDTO, LinnaeanRankClassification}
+
 
 /**
  * A DAO for accessing classification information in the cache. If the
@@ -87,8 +89,8 @@ object ClassificationDAO {
     } else {
 
       //attempt 1: search via taxonConceptID if provided
-      val idnsr = if(cl.taxonConceptID != null) {
-        nameIndex.searchForRecordByLsid(cl.taxonConceptID)
+      val idnsr = if(cl.taxonID != null) {
+        nameIndex.searchForRecordByLsid(cl.taxonID)
       } else {
         null
       }
